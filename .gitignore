@@ -349,4 +349,4 @@ MigrationBackup/
 .ionide/
 
 /logs/
-/.idea/
+.env

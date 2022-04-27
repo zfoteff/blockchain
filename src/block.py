@@ -3,7 +3,8 @@ import time
 
 class Block:
     """Block class object. Contains a block's value, proof, hash, and previous hash value. If 
-    the object does not have a hash, then the object should be considered an unsaved element
+    the object does not have a hash, then the object should be considered an unsaved element. 
+    The block's value should be represented by the 
 
     TODO: Check the object's hash before setting the dirty flag
     """

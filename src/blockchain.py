@@ -19,6 +19,7 @@ class Blockchain:
         self, create_time: float = time.time(), modify_time: float = time.time()
     ) -> None:
         self.__chain = []
+        self.__pending_transactions = []
         self.__create_time = create_time
         self.__modify_time = modify_time
 
