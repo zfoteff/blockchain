@@ -14,7 +14,7 @@ class Block:
     def __init__(
         self,
         index: int = 0,
-        value: dict = None,
+        value: dict = dict(),
         proof: float = 0,
         prev_hash: str = None,
         dirty: bool = True,
@@ -79,7 +79,7 @@ class Block:
         self.__modify_time = modify_time
 
     def metadata(self) -> dict:
-        """Return metadata of block object
+        """Return metadata digest of block object
 
         Returns:
             dict: JSON object containing block metadata
@@ -91,11 +91,11 @@ class Block:
         }
 
     def to_dict(self) -> dict:
-        """Return a dictionary representation of this block object. Should be used instead of the 
+        """Return a dictionary digest of this block object. Should be used instead of the 
         built in __to_dict__() function for database insertions
 
         Returns:
-            dict: JSON representation of the 
+            dict: JSON digest of the block object
         """
         return {
             "index": self.__index,
@@ -106,3 +106,6 @@ class Block:
             "create_time": self.__create_time,
             "modify_time": self.__modify_time,
         }
+
+    def __str__(self) -> str:
+        return f"Block[{self.__index}]{self.__value}"

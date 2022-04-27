@@ -6,6 +6,7 @@ import json
 import time
 from src.block import Block
 from bin.logger import Logger
+from bin.constants import *
 
 
 logger = Logger("blockchain")
@@ -16,24 +17,57 @@ class Blockchain:
     Blockchain class object"""
 
     def __init__(
-        self, name:str="", owner: str=None, create_time: float = time.time(), modify_time: float = time.time()
+        self,
+        name: str = DEFAULT_CHAIN_NAME,
+        owner: str = DEFAULT_CHAIN_OWNER,
+        create_time: float = time.time(),
+        modify_time: float = time.time(),
     ) -> None:
+        self.__name = name
+        self.__owner = owner
         self.__chain = list()
-        self.__pending_transactions = []
+        self.__pending_transactions = list()
         self.__create_time = create_time
         self.__modify_time = modify_time
 
     @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def owner(self) -> str:
+        return self.__owner
+
+    @property
+    def chain(self) -> list:
+        return self.__chain
+
+    @property
+    def pending_transactions(self) -> list:
+        return self.__pending_transactions
+
+    @property
     def size(self) -> int:
-        return len(self.chain)
+        """Return length of the chain"""
+        return len(self.__chain)
 
     def __persist(self) -> bool:
+        """Persist a blockchain instance to the database
+
+        Returns:
+            bool: Return true if the object is persisted to the database, false otherwise
+        """
         pass
 
     def __restore(self) -> bool:
+        """Restore blockchain object from the database
+
+        Returns:
+            bool: Return true if object is restored from the database, false otherwise
+        """
         pass
 
-    def hash_block(self, block: Block) -> str:
+    def hash_block(self, block: Block=None) -> str:
         pass
 
     def append_block(self, block: Block = None) -> bool:
@@ -57,4 +91,7 @@ class Blockchain:
         pass
 
     def __str__(self) -> str:
-        pass
+        return f"{self.__name} (Owner: {self.__owner}) {self.__chain}"
+
+    def __len__(self) -> int:
+        return len(self.__chain)
