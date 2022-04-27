@@ -51,6 +51,18 @@ class Blockchain:
         """Return length of the chain"""
         return len(self.__chain)
 
+    @property
+    def create_time(self) -> float:
+        return self.__create_time
+
+    @property
+    def modify_time(self) -> float:
+        return self.__modify_time
+
+    @modify_time.setter
+    def modify_time(self, modify_time: float) -> None:
+        self.__modify_time = modify_time
+
     def __persist(self) -> bool:
         """Persist a blockchain instance to the database
 
