@@ -16,9 +16,9 @@ class Blockchain:
     Blockchain class object"""
 
     def __init__(
-        self, create_time: float = time.time(), modify_time: float = time.time()
+        self, name:str="", owner: str=None, create_time: float = time.time(), modify_time: float = time.time()
     ) -> None:
-        self.__chain = []
+        self.__chain = list()
         self.__pending_transactions = []
         self.__create_time = create_time
         self.__modify_time = modify_time
