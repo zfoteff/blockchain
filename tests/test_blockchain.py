@@ -18,8 +18,9 @@ class TestBlockChain(unittest.TestCase):
         self.assertIsNotNone(chain)
         self.assertIsInstance(chain, Blockchain)
         elapsed_time = time.time() - start_time
-        logger.log(f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}")
-
+        logger.log(
+            f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}"
+        )
 
     def test_default_blockchain_values(self) -> None:
         start_time = time.time()
@@ -29,7 +30,9 @@ class TestBlockChain(unittest.TestCase):
         self.assertEqual(chain.chain, [])
         self.assertEqual(chain.pending_transactions, [])
         elapsed_time = time.time() - start_time
-        logger.log(f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}")
+        logger.log(
+            f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}"
+        )
 
     def test_blockchain_constructor(self) -> None:
         start_time = time.time()
@@ -41,7 +44,10 @@ class TestBlockChain(unittest.TestCase):
         self.assertEqual(chain.chain, [])
         self.assertEqual(chain.pending_transactions, [])
         elapsed_time = time.time() - start_time
-        logger.log(f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}")
+        logger.log(
+            f"Completed block chain default values test in {elapsed_time:.3f} seconds. Created {chain}"
+        )
+
 
 class TestProofOfWork(unittest.TestCase):
     def test_incorrect_proof(self) -> None:

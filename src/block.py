@@ -5,12 +5,13 @@ import time
 
 
 class Block:
-    """Block class object. Contains a block's value, proof, hash, and previous hash value. If 
-    the object does not have a hash, then the object should be considered an unsaved element. 
-    The block's value should be represented by the 
+    """Block class object. Contains a block's value, proof, hash, and previous hash value. If
+    the object does not have a hash, then the object should be considered an unsaved element.
+    The block's value should be represented by the
 
     TODO: Check the object's hash before setting the dirty flag
     """
+
     def __init__(
         self,
         index: int = 0,
@@ -91,7 +92,7 @@ class Block:
         }
 
     def to_dict(self) -> dict:
-        """Return a dictionary digest of this block object. Should be used instead of the 
+        """Return a dictionary digest of this block object. Should be used instead of the
         built in __to_dict__() function for database insertions
 
         Returns:

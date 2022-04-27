@@ -7,6 +7,7 @@ from src.block import Block
 
 logger = Logger("./block")
 
+
 class TestBlocks(unittest.TestCase):
     def test_not_null_block(self) -> None:
         start_time = time.time()
@@ -15,7 +16,7 @@ class TestBlocks(unittest.TestCase):
         self.assertIsInstance(block, Block)
         elapsed_time = time.time() - start_time
         logger.log(f"Completed block instance test in {elapsed_time:.3f} seconds")
-    
+
     def test_default_block_values(self) -> None:
         start_time = time.time()
         block = Block()
@@ -25,7 +26,9 @@ class TestBlocks(unittest.TestCase):
         self.assertEqual(block.prev_hash, None)
         self.assertEqual(block.dirty, True)
         elapsed_time = time.time() - start_time
-        logger.log(f"Completed block default values test in {elapsed_time:.3f} seconds. Created {block}")
+        logger.log(
+            f"Completed block default values test in {elapsed_time:.3f} seconds. Created {block}"
+        )
 
     def test_block_constructor(self) -> None:
         start_time = time.time()
@@ -38,4 +41,6 @@ class TestBlocks(unittest.TestCase):
         self.assertEqual(block.value, test_value)
         self.assertEqual(block.proof, test_proof)
         elapsed_time = time.time() - start_time
-        logger.log(f"Completed block constructor values test in {elapsed_time:.3f} seconds. Created {block}")
+        logger.log(
+            f"Completed block constructor values test in {elapsed_time:.3f} seconds. Created {block}"
+        )

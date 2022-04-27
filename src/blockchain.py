@@ -79,7 +79,7 @@ class Blockchain:
         """
         pass
 
-    def hash_block(self, block: Block=None) -> str:
+    def hash_block(self, block: Block = None) -> str:
         pass
 
     def append_block(self, block: Block = None) -> bool:

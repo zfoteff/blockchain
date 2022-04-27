@@ -8,7 +8,7 @@ import logging as log
 LOG_DIR = str(os.getcwd()) + "\\logs\\"
 
 
-def log_setup(logger_name: str, log_file: str, mode: str = 'w'):
+def log_setup(logger_name: str, log_file: str, mode: str = "w"):
     """
     Configure a new logger and return the new instance to the user
 
@@ -47,7 +47,7 @@ class Logger:
         """
         self.log_obj = log_setup(f"{key}", LOG_DIR + f"{key}.log")
 
-    def __call__(self, log_str: str, mode: str = 'i'):
+    def __call__(self, log_str: str, mode: str = "i"):
         """
         Call the object to have a message immediately logged to the debug output
 
@@ -55,13 +55,13 @@ class Logger:
             log_str (str): Message to add to the logfile
             mode (str, optional): Logging mode for the file. Defaults to 'i' for Info
         """
-        if mode == 'i':
+        if mode == "i":
             self.log_obj.info(log_str)
-        elif mode == 'd':
+        elif mode == "d":
             self.log_obj.debug(log_str)
-        elif mode == 'e':
+        elif mode == "e":
             self.log_obj.error(log_str)
-        elif mode == 'w':
+        elif mode == "w":
             self.log_obj.warning(log_str)
         else:
             self.log_obj.info(log_str)
