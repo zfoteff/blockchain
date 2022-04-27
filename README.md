@@ -1,4 +1,4 @@
-CS07: Economic Recovery Dashboard
+Block Chain Demo
 ==========
 ![Python3](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 
