@@ -1,0 +1,28 @@
+collection per chain with one metadata entry
+Each collection contains an entry per block in the chains
+
+blockchain
+	name (str): Blockchain name
+	owner (str): Blockchain owner
+	chain (list): list of block objects
+	pending_transactions (list): list of pending_transactions to the chain
+	create_time (float): time the object was created
+	modify_time (float): time the object was last modified
+	
+block
+	index (int): block index in the chain
+	value (object): JSON object containing the block's value
+	proof (float): Proof of work for the block
+	hash (str): Object hash
+	prev_hash(str): Hash of previous object in the chain
+	create_time (float): time the object was created / mined in 
+	modify_time (float): time the object was last modified
+
+user collection
+each collection contains an user and a list of their mined / owned blocks
+
+user
+	alias (str): user alias in the application
+	transactions (list): list of JSON objects containing the user's mined blocks
+	create_time (float): time the object was created
+	modify_time (float): time the object was last modified
