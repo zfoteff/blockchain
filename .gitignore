@@ -4,15 +4,11 @@ logs/
 /.pytest_cache/
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+**/__pycache__/
 *.py[cod]
-
-# C extensions
-*.so
 
 # Distribution / packaging
 build/
-develop-eggs/
 dist/
 eggs/
 lib/
