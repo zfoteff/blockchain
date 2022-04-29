@@ -17,11 +17,9 @@ Install pip packages
 pip install -r requirements.txt
 ```
 
-## Generate Swagger documentation
-
 # Run: 
 ```bash
-npm start
+python server.py
 ```
 
 ## Format Files

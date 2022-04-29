@@ -93,14 +93,29 @@ class Blockchain:
         """
         return self.chain[-1]
 
+    def get_current_hash(self) -> str:
+        return self.get_last_block()['hash']
+
     def proof_of_work(self) -> dict:
         pass
 
     def to_dict(self) -> dict:
-        pass
+        return {
+            "name": self.__name,
+            "owner": self.__owner,
+            "chain": self.__chain,
+            "pending_transactions": self.__pending_transactions,
+            "create_time": self.__create_time,
+            "modify_time": self.__modify_time,
+        }
 
     def metadata(self) -> dict:
-        pass
+        return {
+            "name": self.__name,
+            "owner": self.__owner,
+            "create_time": self.__create_time,
+            "modify_time": self.__modify_time,
+        }
 
     def __str__(self) -> str:
         return f"{self.__name} (Owner: {self.__owner}) {self.__chain}"
