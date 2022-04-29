@@ -27,5 +27,3 @@ In root directory
 ```commandline
 python -m black
 ```
-
-# Usage
