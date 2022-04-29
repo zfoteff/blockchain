@@ -4,10 +4,12 @@ __author__ = "Zac Foteff"
 import hashlib
 import json
 import time
-from src.block import Block
-from bin.logger import Logger
-from bin.constants import *
 
+from bin.constants import *
+from bin.db_helper import MongoDBHelper
+from bin.logger import Logger
+
+from src.block import Block
 
 logger = Logger("blockchain")
 
@@ -29,6 +31,8 @@ class Blockchain:
         self.__pending_transactions = list()
         self.__create_time = create_time
         self.__modify_time = modify_time
+
+        self.__db_helper = MongoDBHelper(db_collection=self.__name)
 
     @property
     def name(self) -> str:

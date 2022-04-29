@@ -5,7 +5,7 @@ from bin.logger import Logger
 from src.block import Block
 from src.blockchain import Blockchain
 
-logger = Logger("./blockChain")
+logger = Logger("blockchainTest")
 
 
 class TestBlockChain(unittest.TestCase):

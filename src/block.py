@@ -113,7 +113,6 @@ class Block:
             "value": self.__value,
             "proof": self.__proof,
             "prev_hash": self.__prev_hash,
-            "dirty": self.__dirty,
             "create_time": self.__create_time,
             "modify_time": self.__modify_time,
         }
