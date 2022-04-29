@@ -37,3 +37,14 @@ class TestAPI(unittest.TestCase):
 
         elapsed_time = time.perf_counter() - start_time
         log(f"[+] Completed get chain endpoint in {elapsed_time:.5f}")
+
+class TestAppCache(unittest.TestCase):
+    def setUp(self) -> None:
+        self.client = TestClient(app)
+        return super().setUp()
+
+    def test_empty_cache(self):
+        start_time = time.perf_counter()
+
+        elapsed_time = time.perf_counter() - start_time
+        log(f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}")

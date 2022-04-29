@@ -17,6 +17,7 @@ class Block:
         index: int = 0,
         value: dict = dict(),
         proof: float = 0,
+        hash: str = None,
         prev_hash: str = None,
         dirty: bool = True,
         create_time: float = time.time(),
@@ -25,6 +26,7 @@ class Block:
         self.__index = index
         self.__value = value
         self.__proof = proof
+        self.__hash = hash
         self.__prev_hash = prev_hash
         self.__dirty = dirty
         self.__create_time = create_time
@@ -50,6 +52,14 @@ class Block:
     @property
     def proof(self) -> int:
         return self.__proof
+
+    @property
+    def hash(self) -> str:
+        return self.__hash
+
+    @hash.setter
+    def hash(self, hash) -> None:
+        self.__hash = hash
 
     @property
     def prev_hash(self) -> str:
