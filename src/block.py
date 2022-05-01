@@ -7,30 +7,36 @@ import time
 class Block:
     """Block class object. Contains a block's value, proof, hash, and previous hash value. If
     the object does not have a hash, then the object should be considered an unsaved element.
-    The block's value should be represented by the
-
-    TODO: Check the object's hash before setting the dirty flag
+    The block's value should be represented by a dictionary to allow users to customize the data
+    stored in the block
     """
 
     def __init__(
         self,
         index: int = 0,
-        value: dict = dict(),
         proof: float = 0,
+        value: dict = dict(),
         hash: str = None,
         prev_hash: str = None,
-        dirty: bool = True,
         create_time: float = time.time(),
         modify_time: float = time.time(),
     ) -> None:
+        """Instantiate a Block object. Blocks are created with no hash value or previous hash value
+
+        Args:
+            index (int, optional): _description_. Defaults to 0.
+            proof (float, optional): _description_. Defaults to 0.
+            value (dict, optional): _description_. Defaults to dict().
+            create_time (float, optional): _description_. Defaults to time.time().
+            modify_time (float, optional): _description_. Defaults to time.time().
+        """
         self.__index = index
-        self.__value = value
         self.__proof = proof
-        self.__hash = hash
-        self.__prev_hash = prev_hash
-        self.__dirty = dirty
+        self.__value = value
         self.__create_time = create_time
         self.__modify_time = modify_time
+        self.__hash = hash
+        self.__prev_hash = prev_hash
 
     @property
     def index(self) -> int:
@@ -68,14 +74,6 @@ class Block:
     @prev_hash.setter
     def prev_hash(self, prev_hash) -> None:
         self.__prev_hash = prev_hash
-
-    @property
-    def dirty(self) -> bool:
-        return self.__dirty
-
-    @dirty.setter
-    def dirty(self, dirty) -> None:
-        self.__dirty = dirty
 
     @property
     def create_time(self) -> float:

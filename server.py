@@ -1,15 +1,16 @@
 __version__ = "1.0.0"
 __author__ = "Zac Foteff"
 
-from this import s
 import time
-from uvicorn import run
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.block import Block
-from src.blockchain import Blockchain
+from uvicorn import run
+
 from bin.constants import *
 from bin.logger import Logger
+from src.block import Block
+from src.blockchain import Blockchain
 
 app = FastAPI(title="Blockchain Demo")
 log = Logger("api")
@@ -180,12 +181,10 @@ async def create_block(req: Request) -> JSONResponse:
         chain = Blockchain(name=chain_name)
         cache[chain_name] = chain
 
-    prev_hash = chain.get_current_hash()
     block = Block(
         index=chain.length + 1,
         value=body["block_value"],
         proof=body["block_proof"],
-        prev_hash=prev_hash,
     )
     chain.append_block(block)
     log(f"[+] Inserted {block} into chain {chain}")
