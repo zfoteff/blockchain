@@ -3,6 +3,7 @@ __author__ = "Zac Foteff"
 
 import hashlib
 import json
+from tabnanny import check
 import time
 
 from bin.constants import *
@@ -86,6 +87,17 @@ class Blockchain:
         """
         pass
 
+    def hash_block(self, block: Block) -> str:
+        """Generate hash of a inputted block
+
+        Args:
+            block (Block): Block to hash
+        Returns:
+            str: Hash digest of the block contents
+        """
+        encoded_block = json.dumps(block.to_dict(), sort_keys=True).encode()
+        return hashlib.sha256(encoded_block).hexdigest()
+
     def append_block(self, block: Block) -> bool:
         """Append a block to the chain. Should also hash the object and set the previous hash value
 
@@ -96,9 +108,7 @@ class Blockchain:
         """
         if block is not None:
             block.prev_hash = self.get_current_hash()
-            encoded_block = str(block.to_dict()).encode()
-            hash = hashlib.sha256(encoded_block).hexdigest()
-            block.hash = hash
+            block.hash = self.hash_block(block)
             self.__chain.append(block)
             return True
         return False
@@ -125,8 +135,25 @@ class Blockchain:
         else: 
             return self.get_last_block().hash
 
-    def proof_of_work(self) -> dict:
-        pass
+    def prove_work(self) -> int:
+        """Solve an algorithm and get a new proof for a block
+
+        Returns:
+            int: _description_
+        """
+        proof = 1
+        prev_proof = self.get_last_block().hash
+        if prev_proof is None:
+            return -1
+
+        check_proof = False
+        while check_proof:
+            hash = hashlib.sha256(str(proof**2-prev_proof**2).encode()).hexdigest()
+            if hash[:4] == '0000':
+                check_proof = True
+
+            proof += 1
+        return proof
 
     def to_dict(self) -> dict:
         return {

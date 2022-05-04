@@ -14,7 +14,7 @@ class Block:
     def __init__(
         self,
         index: int = 0,
-        proof: float = 0,
+        proof: float = 0.0,
         value: dict = dict(),
         hash: str = None,
         prev_hash: str = None,
