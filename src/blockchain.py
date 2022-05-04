@@ -34,6 +34,9 @@ class Blockchain:
 
         self.__db_helper = MongoDBHelper(db_collection=self.__name)
 
+        genesis_block = Block(value={"purpose": "Genesis Block"})
+        append_result = self.append_block(genesis_block)
+
     @property
     def name(self) -> str:
         return self.__name
@@ -83,22 +86,44 @@ class Blockchain:
         """
         pass
 
-    def hash_block(self, block: Block = None) -> str:
-        pass
+    def append_block(self, block: Block) -> bool:
+        """Append a block to the chain. Should also hash the object and set the previous hash value
 
-    def append_block(self, block: Block = None) -> bool:
-        pass
+        Args:
+            block (Block): Defaults to None.
+        Returns:
+            bool: _description_
+        """
+        if block is not None:
+            block.prev_hash = self.get_current_hash()
+            encoded_block = str(block.to_dict()).encode()
+            hash = hashlib.sha256(encoded_block).hexdigest()
+            block.hash = hash
+            self.__chain.append(block)
+            return True
+        return False
 
-    def get_last_block(self) -> dict:
+    def get_last_block(self) -> Block | None:
         """Retrieve the last inserted block in the chain
 
         Returns:
-            dict: JSON representation of the block's data
+            Block: Last block in the chain, or None if the chain is empty
         """
-        return self.chain[-1]
+        try:
+            return self.chain[-1]
+        except IndexError:
+            return None
 
     def get_current_hash(self) -> str:
-        return self.get_last_block()['hash']
+        """Get the hash of the last block in the chain
+
+        Returns:
+            str: Hash of the terminal block in the chain
+        """
+        if self.get_last_block() is None:
+            return hashlib.sha256("genesis".encode()).hexdigest()
+        else: 
+            return self.get_last_block().hash
 
     def proof_of_work(self) -> dict:
         pass

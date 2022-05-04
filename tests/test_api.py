@@ -32,6 +32,7 @@ class TestAPI(unittest.TestCase):
         elapsed_time = time.perf_counter() - start_time
         log(f"[+] Completed get root test in {elapsed_time:.5f}")
 
+
 class TestAppCache(unittest.TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
@@ -41,4 +42,6 @@ class TestAppCache(unittest.TestCase):
         start_time = time.perf_counter()
 
         elapsed_time = time.perf_counter() - start_time
-        log(f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}")
+        log(
+            f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}"
+        )

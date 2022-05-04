@@ -24,7 +24,6 @@ class TestBlocks(unittest.TestCase):
         self.assertEqual(block.value, {})
         self.assertEqual(block.proof, 0.0)
         self.assertEqual(block.prev_hash, None)
-        self.assertEqual(block.dirty, True)
         elapsed_time = time.time() - start_time
         logger.log(
             f"Completed block default values test in {elapsed_time:.3f} seconds. Created {block}"
