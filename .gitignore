@@ -2,6 +2,7 @@
 logs/
 .env
 /.pytest_cache/
+blockchain/
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
@@ -31,5 +32,4 @@ pip-delete-this-directory.txt
 .cache
 nosetests.xml
 coverage.xml
-
 

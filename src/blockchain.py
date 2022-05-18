@@ -3,7 +3,6 @@ __author__ = "Zac Foteff"
 
 import hashlib
 import json
-from tabnanny import check
 import time
 
 from bin.constants import *
