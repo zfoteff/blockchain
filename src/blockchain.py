@@ -32,22 +32,22 @@ class Blockchain:
         self.__pending_transactions = list()
         self.__create_time = create_time
         self.__modify_time = modify_time
-        self.__dirty = True
-
-        genesis_block = Block(value={"purpose": "Genesis Block"})
-        append_result = self.append_block(genesis_block)
-
-        self.__db_client = MongoClient(host=DEV_MONGO_HOST, port=DEV_MONGO_PORT)
+        self.__db_collection = None
+        self.__db_client = MongoClient(host=DEV_MONGO_HOST, port=int(DEV_MONGO_PORT))
         self.__db = self.__db_client.get_database(DEFAULT_DATABASE_NAME)
         self.__db_collection = self.__db.get_collection(self.__name)
 
         if self.__db_collection is None:
             # Initialize the chains collection in the DB if it doesn't exist
-            log(f'[-] No collection exists for chain {self.__name}. Creating . . .')
+            log(f"[-] No collection exists for chain {self.__name}. Creating . . .")
             self.__db_collection = self.__db.create_collection(self.__name)
 
         if self.__restore():
             self.__dirty = False
+        else:
+            genesis_block = Block(value={"purpose": "Genesis Block"})
+            self.append_block(genesis_block)
+            self.__dirty = True
 
     @property
     def name(self) -> str:
@@ -88,7 +88,7 @@ class Blockchain:
         Returns:
             bool: Return true if the object is persisted to the database, false otherwise
         """
-        if self.__db_helper.collection.find_one({"chain_name": {"$exists": "false"}}):
+        if self.__db_collection.find_one({"chain_name": {"$exists": "false"}}):
             chain_update_filter = {"chain_name": self.__name}
             new_chain_value = {"$set": self.to_dict()}
             self.__db_collection.update_one(
@@ -98,7 +98,9 @@ class Blockchain:
         for block in self.__chain:
             block_update_filter = {"hash": block.hash}
             block_values = {"$set": block.to_dict()}
-            self.__db_collection.update_one(block_update_filter, block_values, upsert=True)
+            self.__db_collection.update_one(
+                block_update_filter, block_values, upsert=True
+            )
 
         log("[+] Persisted chain object to the database")
 
@@ -108,7 +110,7 @@ class Blockchain:
         Returns:
             bool: Return true if object is restored from the database, false otherwise
         """
-        chain_metadata = self.__db_helper.find_one({"chain_name": {"$exists": "true"}})
+        chain_metadata = self.__db_collection.find_one({"chain_name": {"$exists": "true"}})
         if chain_metadata is None:
             log("[*] No metadata found for chain. Creating new colleciton . . .", "w")
             self.__persist()
@@ -119,7 +121,7 @@ class Blockchain:
         self.__create_time = chain_metadata["create_time"]
         self.__modify_time = chain_metadata["modify_time"]
 
-        for block_data in self.__db_helper.find({"hash": {"$exists": "true"}}):
+        for block_data in self.__db_collection.find({"hash": {"$exists": "true"}}):
             new_block = Block(
                 index=block_data["index"],
                 proof=block_data["proof"],

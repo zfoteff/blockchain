@@ -5,7 +5,7 @@ Logging helper class
 import os
 import logging as log
 
-LOG_DIR = str(os.getcwd()) + "\\logs\\"
+LOG_DIR = str(os.getcwd()) + "/logs/"
 
 
 def log_setup(logger_name: str, log_file: str, mode: str = "w"):
