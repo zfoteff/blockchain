@@ -147,6 +147,7 @@ async def create_block(req: Request) -> JSONResponse:
 
     #   Validate the request body
     if body is None:
+        #   If no body is submitted, return error response
         return JSONResponse(
             status_code=400,
             content={"result": "Failure", "reason": "Empty request body"},
@@ -156,6 +157,7 @@ async def create_block(req: Request) -> JSONResponse:
         or body["block_value"] is None
         or body["block_proof"] is None
     ):
+        #   If body parameters do not include 
         return JSONResponse(
             status_code=400,
             content={

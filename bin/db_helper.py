@@ -13,7 +13,7 @@ class MongoDBHelper:
     def __init__(self, db_name: str=DEFAULT_DATABASE_NAME, db_collection: str=DEFAULT_CHAIN_NAME) -> None:
         self.__db_name = db_name
         self.__db_collection_name = db_collection
-        self.__db_client = MongoClient(MONGO_CONNECTION_STRING)
+        self.__db_client = MongoClient(host=DEV_MONGO_HOST, port=DEV_MONGO_PORT)
         self.__db = self.__db_client.get_database(self.__db_name)
         self.__db_collection = self.__db.get_collection(self.__db_collection_name)
 
@@ -22,6 +22,10 @@ class MongoDBHelper:
     @property
     def db_name(self) -> str:
         return self.__db_name
+
+    @property
+    def db(self):
+        return self.__db
 
     @property
     def db_collection_name(self) -> str:
