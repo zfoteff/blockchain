@@ -17,9 +17,25 @@ Install pip packages
 pip install -r requirements.txt
 ```
 
+# Docker
+## Build Docker Image
+Build Docker Image
+```bash
+docker build -t blockchain-image .
+```
+
+Run Docker Image
+```bash
+docker run -d --name blockchain-container -p 8000:8000 blockchain-image
+```
+
 # Run: 
 ```bash
 python server.py
+```
+or
+```
+uvicorn server:app
 ```
 
 ## Format Files
