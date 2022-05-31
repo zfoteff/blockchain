@@ -110,6 +110,7 @@ class Block:
             "index": self.__index,
             "value": self.__value,
             "proof": self.__proof,
+            "hash": self.__hash,
             "prev_hash": self.__prev_hash,
             "create_time": self.__create_time,
             "modify_time": self.__modify_time,
