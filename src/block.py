@@ -15,8 +15,8 @@ class Block:
         self,
         index: int = 0,
         proof: float = 0.0,
-        value: dict = dict(),
-        hash: str = None,
+        value=None,
+        hash_value: str = None,
         prev_hash: str = None,
         create_time: float = time.time(),
         modify_time: float = time.time(),
@@ -30,12 +30,14 @@ class Block:
             create_time (float, optional): _description_. Defaults to time.time().
             modify_time (float, optional): _description_. Defaults to time.time().
         """
+        if value is None:
+            value = dict()
         self.__index = index
         self.__proof = proof
         self.__value = value
         self.__create_time = create_time
         self.__modify_time = modify_time
-        self.__hash = hash
+        self.__hash_value = hash_value
         self.__prev_hash = prev_hash
 
     @property
@@ -56,16 +58,12 @@ class Block:
         self.__value = value
 
     @property
-    def proof(self) -> int:
+    def proof(self) -> float:
         return self.__proof
 
     @property
-    def hash(self) -> str:
-        return self.__hash
-
-    @hash.setter
-    def hash(self, hash) -> None:
-        self.__hash = hash
+    def hash_value(self) -> str:
+        return self.__hash_value
 
     @property
     def prev_hash(self) -> str:
@@ -101,7 +99,7 @@ class Block:
 
     def to_dict(self) -> dict:
         """Return a dictionary digest of this block object. Should be used instead of the
-        built in __to_dict__() function for database insertions
+        built-in __to_dict__() function for database insertions
 
         Returns:
             dict: JSON digest of the block object
@@ -110,7 +108,7 @@ class Block:
             "index": self.__index,
             "value": self.__value,
             "proof": self.__proof,
-            "hash": self.__hash,
+            "hash": self.__hash_value,
             "prev_hash": self.__prev_hash,
             "create_time": self.__create_time,
             "modify_time": self.__modify_time,
