@@ -1,5 +1,3 @@
-
-logs/*
 .env
 /.pytest_cache/
 blockchain/
@@ -33,4 +31,6 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 
-/.idea
+/.idea/
+.vscode/
+/logs/*

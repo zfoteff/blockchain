@@ -65,6 +65,10 @@ class Block:
     def hash_value(self) -> str:
         return self.__hash_value
 
+    @hash_value.setter
+    def hash_value(self, hash_value) -> None:
+        self.__hash_value = hash_value
+
     @property
     def prev_hash(self) -> str:
         return self.__prev_hash
@@ -108,7 +112,7 @@ class Block:
             "index": self.__index,
             "value": self.__value,
             "proof": self.__proof,
-            "hash": self.__hash_value,
+            "hash_value": self.__hash_value,
             "prev_hash": self.__prev_hash,
             "create_time": self.__create_time,
             "modify_time": self.__modify_time,
