@@ -5,8 +5,6 @@
 __pycache__/
 /tests
 /logs/*
-.env
-.env.dist
 pip-log.txt
 *.pyc
 *.pyo
