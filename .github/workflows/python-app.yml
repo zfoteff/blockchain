@@ -12,6 +12,9 @@ on:
 env:
   MONGO_USER: ${{ secrets.MONGO_USER }}
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+  DEV_MONGO_HOST: ${{ secrets.DEV_MONGO_HOST }}
+  DEV_MONGO_PORT: ${{ secrets.DEV_MONGO_PORT }}
+  DEV_MONGO_URL: ${{ secrets.DEV_MONGO_URL }}
 
 permissions:
   contents: read
