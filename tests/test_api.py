@@ -1,10 +1,15 @@
+__version__ = "1.0.0"
+__author__ = "Zac Foteff"
+
 import time
 import random
 import string
 import unittest
-from bin.logger import Logger
+
 from server import app
 from fastapi.testclient import TestClient
+
+from bin.logger import Logger
 
 log = Logger("apiTest")
 

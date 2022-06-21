@@ -3,8 +3,7 @@ Block Chain Demo
 ![Python3](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 
 # About the Project
-This project is intended to create a simplified blockchain that can be manipulated and deployed in a docker image. An
-additional goal of this project is to make the project collaborative using GitHub's project and collaboration features.
+This project is intended to create a simplified blockchain that can be manipulated and deployed in a docker image. A primary goal of this project is to practice creating CI/CD pipelines in GitHub. This project has enough moving parts to continously deploy the application and publish a docker image. An additional goal of this project is to make the project collaborative using GitHub's project and collaboration features.
 
 Used Adetu Ridwan's [blockchain tutorial](https://www.section.io/engineering-education/how-to-create-a-blockchain-in-python/) as inspiration
 
@@ -36,6 +35,10 @@ python server.py
 or
 ```
 uvicorn server:app
+```
+
+# Test:
+```bash
 ```
 
 ## Format Files

@@ -9,6 +9,7 @@ from pymongo import MongoClient
 
 from bin.constants import *
 from bin.logger import Logger
+from bin.db_helper import BlockchainDBController
 
 from src.block import Block
 
@@ -126,7 +127,7 @@ class Blockchain:
                 index=block_data["index"],
                 proof=block_data["proof"],
                 value=block_data["value"],
-                hash=block_data["hash"],
+                hash_value=block_data["hash"],
                 prev_hash=block_data["prev_hash"],
                 create_time=block_data["create_time"],
                 modify_time=block_data["modify_time"],
@@ -156,7 +157,7 @@ class Blockchain:
         """
         if block is not None:
             block.prev_hash = self.get_current_hash()
-            block.hash = self.hash_block(block)
+            block.hash_value = self.hash_block(block)
             self.__chain.append(block)
             self.__persist()
             return True
@@ -182,7 +183,7 @@ class Blockchain:
         if self.get_last_block() is None:
             return hashlib.sha256("genesis".encode()).hexdigest()
         else:
-            return self.get_last_block().hash
+            return self.get_last_block().hash_value
 
     def prove_work(self) -> int:
         """Solve an algorithm and get a new proof for a block
@@ -191,7 +192,7 @@ class Blockchain:
             int: _description_
         """
         proof = 1
-        prev_proof = self.get_last_block().hash
+        prev_proof = self.get_last_block().hash_value
         if prev_proof is None:
             return -1
 

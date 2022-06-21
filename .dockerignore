@@ -1,5 +1,16 @@
 /blockchain
 /.vscode
+/.idea
 **/__pycache__/
 __pycache__/
 /bin/logger
+/tests
+env
+pip-log.txt
+*.pyc
+*.pyo
+*.pyd
+*.cover
+*.log
+.git
+.pytest_cache
