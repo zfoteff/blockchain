@@ -50,3 +50,6 @@ class TestAppCache(unittest.TestCase):
         log(
             f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}"
         )
+
+if __name__ == "__main__":
+    unittest.main()

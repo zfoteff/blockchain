@@ -1,3 +1,6 @@
+__version__ = "1.0.0"
+__author__ = "Zac Foteff"
+
 import random
 import time
 import unittest
@@ -43,3 +46,6 @@ class TestBlocks(unittest.TestCase):
         logger.log(
             f"Completed block constructor values test in {elapsed_time:.3f} seconds. Created {block}"
         )
+
+if __name__ == "__main__":
+    unittest.main()

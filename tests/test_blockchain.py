@@ -1,6 +1,8 @@
+__version__ = "1.0.0"
+__author__ = "Zac Foteff"
+
 import time
 import unittest
-from mockupdb import MockupDB
 from bin.constants import *
 from bin.logger import Logger
 from src.block import Block
@@ -12,11 +14,6 @@ log = Logger("blockchainTest")
 class TestBlockChain(unittest.TestCase):
     BLOCK_CHAIN_NAME = "btc"
     BLOCK_CHAIN_OWNER = "Zac"
-
-    def setUp(self):
-        self.server = MockupDB()
-        self.server.run()
-        self.addCleanup(self.server.stop)
 
     def test_not_null_blockchain(self) -> None:
         start_time = time.perf_counter()
@@ -67,9 +64,12 @@ class TestBlockChain(unittest.TestCase):
     def test_persist_chain_in_database(self) -> None:
         start_time = time.perf_counter()
         chain = Blockchain(self.BLOCK_CHAIN_NAME, self.BLOCK_CHAIN_OWNER)
-        elapsed_time = time.perf_counter - start_time
+        elapsed_time = time.perf_counter() - start_time
         log(f"Completed blockchain persistance test{elapsed_time:.3f}")
 
 class TestProofOfWork(unittest.TestCase):
     def test_incorrect_proof(self) -> None:
         pass
+
+if __name__ == "__main__":
+    unittest.main()

@@ -97,7 +97,7 @@ class Blockchain:
             )
 
         for block in self.__chain:
-            block_update_filter = {"hash": block.hash}
+            block_update_filter = {"hash": block.hash_value}
             block_values = {"$set": block.to_dict()}
             self.__db_collection.update_one(
                 block_update_filter, block_values, upsert=True
@@ -122,12 +122,12 @@ class Blockchain:
         self.__create_time = chain_metadata["create_time"]
         self.__modify_time = chain_metadata["modify_time"]
 
-        for block_data in self.__db_collection.find({"hash": {"$exists": "true"}}):
+        for block_data in self.__db_collection.find({"hash_value": {"$exists": "true"}}):
             new_block = Block(
                 index=block_data["index"],
                 proof=block_data["proof"],
                 value=block_data["value"],
-                hash_value=block_data["hash"],
+                hash_value=block_data["hash_value"],
                 prev_hash=block_data["prev_hash"],
                 create_time=block_data["create_time"],
                 modify_time=block_data["modify_time"],
@@ -222,7 +222,7 @@ class Blockchain:
         }
 
     def __str__(self) -> str:
-        return f"{self.__name} (Owner: {self.__owner}) {self.__chain}"
+        return f"{self.__name} (Owner: {self.__owner}) {[block for block in self.__chain]}"
 
     def __len__(self) -> int:
         return len(self.__chain)
