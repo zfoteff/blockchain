@@ -222,7 +222,7 @@ class Blockchain:
         }
 
     def __str__(self) -> str:
-        return f"{self.__name} (Owner: {self.__owner}) {[block for block in self.__chain]}"
+        return f"{self.__name} (Owner: {self.__owner}) {[str(block) for block in self.__chain]}"
 
     def __len__(self) -> int:
         return len(self.__chain)
