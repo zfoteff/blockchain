@@ -7,9 +7,9 @@ import time
 
 from pymongo import MongoClient
 
-from bin.constants import *
-from bin.logger import Logger
-from bin.db_helper import BlockchainDBController
+from docs.constants import *
+from docs.logger import Logger
+from docs.db_helper import BlockchainDBController
 
 from src.block import Block
 

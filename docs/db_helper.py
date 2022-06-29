@@ -3,8 +3,8 @@ __author__ = "Zac Foteff"
 
 from pymongo import MongoClient
 
-from bin.constants import *
-from bin.logger import Logger
+from docs.constants import *
+from docs.logger import Logger
 
 log = Logger("db")
 

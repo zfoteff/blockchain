@@ -1,14 +1,13 @@
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Zac Foteff"
 
 import time
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from uvicorn import run
 
-from bin.constants import *
-from bin.logger import Logger
+from docs.constants import *
+from docs.logger import Logger
 from src.block import Block
 from src.blockchain import Blockchain
 
@@ -16,7 +15,7 @@ app = FastAPI(title="Blockchain Demo")
 log = Logger("api")
 cache = dict()
 app_start_time = time.time()
-log("[-+-] Started listening for events at http://localhost:8000")
+log(f"[-+-] Started listening for events at {app.host}")
 
 
 def __pull_chain(chain_name: str) -> Blockchain | None:
@@ -193,7 +192,3 @@ async def create_block(req: Request) -> JSONResponse:
     return JSONResponse(
         status_code=201, content={"result": "Success", "created": str(block)}
     )
-
-
-if __name__ == "__main__":
-    run(app, host="127.0.0.1", port=8000)
