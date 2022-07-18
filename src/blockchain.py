@@ -5,11 +5,9 @@ import hashlib
 import json
 import time
 
-from pymongo import MongoClient
-
-from docs.constants import *
-from docs.logger import Logger
-from docs.db_helper import BlockchainDBController
+from resources.constants import *
+from resources.logger import Logger
+from resources.db_helper import BlockchainDBController
 
 from src.block import Block
 
@@ -26,6 +24,7 @@ class Blockchain:
         owner: str = DEFAULT_CHAIN_OWNER,
         create_time: float = time.time(),
         modify_time: float = time.time(),
+        db_collection=None,
     ) -> None:
         self.__name = name
         self.__owner = owner
@@ -33,22 +32,12 @@ class Blockchain:
         self.__pending_transactions = list()
         self.__create_time = create_time
         self.__modify_time = modify_time
-        self.__db_collection = None
-        self.__db_client = MongoClient(host=DEV_MONGO_HOST, port=int(DEV_MONGO_PORT))
-        self.__db = self.__db_client.get_database(DEFAULT_DATABASE_NAME)
-        self.__db_collection = self.__db.get_collection(self.__name)
+        self.__db_collection = db_collection
 
         if self.__db_collection is None:
-            # Initialize the chains collection in the DB if it doesn't exist
-            log(f"[-] No collection exists for chain {self.__name}. Creating . . .")
-            self.__db_collection = self.__db.create_collection(self.__name)
-
-        if self.__restore():
-            self.__dirty = False
-        else:
-            genesis_block = Block(value={"purpose": "Genesis Block"})
-            self.append_block(genesis_block)
-            self.__dirty = True
+            self.__db_collection = BlockchainDBController(
+                db_collection=name, connection_uri=MONGO_CONNECTION_STRING
+            )
 
     @property
     def name(self) -> str:
@@ -111,7 +100,9 @@ class Blockchain:
         Returns:
             bool: Return true if object is restored from the database, false otherwise
         """
-        chain_metadata = self.__db_collection.find_one({"chain_name": {"$exists": "true"}})
+        chain_metadata = self.__db_collection.find_one(
+            {"chain_name": {"$exists": "true"}}
+        )
         if chain_metadata is None:
             log("[*] No metadata found for chain. Creating new colleciton . . .", "w")
             self.__persist()
@@ -122,7 +113,9 @@ class Blockchain:
         self.__create_time = chain_metadata["create_time"]
         self.__modify_time = chain_metadata["modify_time"]
 
-        for block_data in self.__db_collection.find({"hash_value": {"$exists": "true"}}):
+        for block_data in self.__db_collection.find(
+            {"hash_value": {"$exists": "true"}}
+        ):
             new_block = Block(
                 index=block_data["index"],
                 proof=block_data["proof"],

@@ -2,22 +2,28 @@ __version__ = "1.1.0"
 __author__ = "Zac Foteff"
 
 import time
+import os
 
+from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse, FileResponse
 
-from docs.constants import *
-from docs.logger import Logger
+from resources.constants import *
+from resources.logger import Logger
 from src.block import Block
 from src.blockchain import Blockchain
 
 app = FastAPI(title="Blockchain Demo")
+app.mount(os.path.join(app.root_path+"/static"), StaticFiles(directory="static"), name="static")
+
 log = Logger("api")
 cache = dict()
+
 app_start_time = time.time()
-log(f"[-+-] Started listening for events at {app.host}")
+log(f"[-+-] Started listening for events on port 8080")
 
-
+@staticmethod
 def __pull_chain(chain_name: str) -> Blockchain | None:
     """Retrieve a chain from the fastApi application's cache of active
 
@@ -32,6 +38,24 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
             return chain["chain_obj"]
 
     return None
+
+@app.on_event("startup")
+async def startup_db_client():
+    app.mongodb_client = AsyncIOMotorClient
+
+@app.get(path="/favicon.ico", status_code=200, include_in_schema=False)
+async def favicon() -> FileResponse:
+    """Return favicon for the application page
+
+    Returns:
+        FileResponse: Favicon image
+    """
+    file_name = "favicon.ico"
+    file_path = os.path.join(app.root_path, "static")
+    return FileResponse(
+        path=file_path,
+        headers={"Content-Disposition": "attachment; filename=" + file_name},
+    )
 
 
 @app.get(path="/", status_code=200)
@@ -93,7 +117,7 @@ async def register_chain(req: Request) -> JSONResponse:
         req (Request): Request containing the chain information.
         the body should contain
         - The chain name
-        - Teh chain owner
+        - The chain owner
     Returns:
         JSONResponse: Return a status object to the user indicating the new status of the
         chain
@@ -156,7 +180,7 @@ async def create_block(req: Request) -> JSONResponse:
         or body["block_value"] is None
         or body["block_proof"] is None
     ):
-        #   If body parameters do not include 
+        #   If body parameters do not include
         return JSONResponse(
             status_code=400,
             content={

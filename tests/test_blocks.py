@@ -4,8 +4,8 @@ __author__ = "Zac Foteff"
 import random
 import time
 import unittest
-from docs.constants import *
-from docs.logger import Logger
+from resources.constants import *
+from resources.logger import Logger
 from src.block import Block
 
 logger = Logger("./block")

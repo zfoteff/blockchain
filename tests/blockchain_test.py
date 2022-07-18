@@ -3,8 +3,9 @@ __author__ = "Zac Foteff"
 
 import time
 import unittest
-from docs.constants import *
-from docs.logger import Logger
+
+from resources.constants import *
+from resources.logger import Logger
 from src.block import Block
 from src.blockchain import Blockchain
 
@@ -59,7 +60,9 @@ class TestBlockChain(unittest.TestCase):
         self.assertIsInstance(chain.chain[0], Block)
         chain = Blockchain(test_chain_name, test_chain_owner)
         elapsed_time = time.perf_counter() - start_time
-        log(f"Completed block chain genesis block existance test in {elapsed_time:.3f} seconds. Created {chain}")
+        log(
+            f"Completed block chain genesis block existance test in {elapsed_time:.3f} seconds. Created {chain}"
+        )
 
     def test_persist_chain_in_database(self) -> None:
         start_time = time.perf_counter()
@@ -67,9 +70,11 @@ class TestBlockChain(unittest.TestCase):
         elapsed_time = time.perf_counter() - start_time
         log(f"Completed blockchain persistance test{elapsed_time:.3f}")
 
+
 class TestProofOfWork(unittest.TestCase):
     def test_incorrect_proof(self) -> None:
         pass
+
 
 if __name__ == "__main__":
     unittest.main()

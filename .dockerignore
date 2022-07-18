@@ -4,7 +4,6 @@
 **/__pycache__/
 __pycache__/
 /tests
-/logs/*
 pip-log.txt
 *.pyc
 *.pyo

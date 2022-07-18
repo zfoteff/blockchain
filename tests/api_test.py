@@ -6,10 +6,10 @@ import random
 import string
 import unittest
 
-from src.server import app
+from server import app
 from fastapi.testclient import TestClient
 
-from docs.logger import Logger
+from resources.logger import Logger
 
 log = Logger("apiTest")
 
