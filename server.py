@@ -4,24 +4,29 @@ __author__ = "Zac Foteff"
 import time
 import os
 
-from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
+from uvicorn import run
 
 from resources.constants import *
 from resources.logger import Logger
+from resources.db_interface import BlockchainDBInterface
 from src.block import Block
 from src.blockchain import Blockchain
 
 app = FastAPI(title="Blockchain Demo")
-app.mount(os.path.join(app.root_path+"/static"), StaticFiles(directory="static"), name="static")
+app.mount(
+    os.path.join(app.root_path + "/static"),
+    StaticFiles(directory="static"),
+    name="static",
+)
 
 log = Logger("api")
-cache = dict()
+cache = dict()  # [Chain name, Chain obj.]
 
 app_start_time = time.time()
-log(f"[-+-] Started listening for events on port 8080")
+
 
 @staticmethod
 def __pull_chain(chain_name: str) -> Blockchain | None:
@@ -39,9 +44,21 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
 
     return None
 
+
 @app.on_event("startup")
-async def startup_db_client():
-    app.mongodb_client = AsyncIOMotorClient
+async def startup():
+    # TODO: Start db client
+
+    log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    # TODO: Clear cache
+    # TODO: Close connection to db client
+
+    log(f"[-X-] Shutdown blockchain application")
+
 
 @app.get(path="/favicon.ico", status_code=200, include_in_schema=False)
 async def favicon() -> FileResponse:
@@ -98,14 +115,19 @@ async def info_digest() -> JSONResponse:
 
 @app.get(path="/v1/chain/", status_code=200)
 async def get_chain(req: Request) -> JSONResponse:
-    """_summary_
+    """Retrieve a chain. First check if the chain exists in the cache. If it does not, then 
+    retrieve it from storage and add it too the cache. Return the serialized chain
 
     Args:
-        req (Request): _description_
+        req (Request): Request containing infomation about the requested chain. The
+        body should contain
+        - The chain name
+        - The chain owner (optional)
     Returns:
-        JSONResponse: _description_
+        JSONResponse: Serialized chain
     """
-    return JSONResponse(status_code=501)
+    # TODO: Validate chain
+    return JSONResponse(status_code=501, content={})
 
 
 @app.post(path="/v1/register_chain/", status_code=201)
@@ -149,6 +171,8 @@ async def get_block(req: Request) -> JSONResponse:
     Returns:
         JSONResponse: _description_
     """
+
+    # TODO: Return a single block from requested chain
     pass
 
 
@@ -216,3 +240,7 @@ async def create_block(req: Request) -> JSONResponse:
     return JSONResponse(
         status_code=201, content={"result": "Success", "created": str(block)}
     )
+
+
+if __name__ == "__main__":
+    run(app)

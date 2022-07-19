@@ -7,7 +7,6 @@ import time
 
 from resources.constants import *
 from resources.logger import Logger
-from resources.db_helper import BlockchainDBController
 
 from src.block import Block
 
@@ -24,7 +23,6 @@ class Blockchain:
         owner: str = DEFAULT_CHAIN_OWNER,
         create_time: float = time.time(),
         modify_time: float = time.time(),
-        db_collection=None,
     ) -> None:
         self.__name = name
         self.__owner = owner
@@ -32,12 +30,6 @@ class Blockchain:
         self.__pending_transactions = list()
         self.__create_time = create_time
         self.__modify_time = modify_time
-        self.__db_collection = db_collection
-
-        if self.__db_collection is None:
-            self.__db_collection = BlockchainDBController(
-                db_collection=name, connection_uri=MONGO_CONNECTION_STRING
-            )
 
     @property
     def name(self) -> str:
@@ -71,63 +63,6 @@ class Blockchain:
     @modify_time.setter
     def modify_time(self, modify_time: float) -> None:
         self.__modify_time = modify_time
-
-    def __persist(self) -> None:
-        """Persist a blockchain instance to the database
-
-        Returns:
-            bool: Return true if the object is persisted to the database, false otherwise
-        """
-        if self.__db_collection.find_one({"chain_name": {"$exists": "false"}}):
-            chain_update_filter = {"chain_name": self.__name}
-            new_chain_value = {"$set": self.to_dict()}
-            self.__db_collection.update_one(
-                chain_update_filter, new_chain_value, upsert=True
-            )
-
-        for block in self.__chain:
-            block_update_filter = {"hash": block.hash_value}
-            block_values = {"$set": block.to_dict()}
-            self.__db_collection.update_one(
-                block_update_filter, block_values, upsert=True
-            )
-
-        log("[+] Persisted chain object to the database")
-
-    def __restore(self) -> bool:
-        """Restore blockchain object from the database
-
-        Returns:
-            bool: Return true if object is restored from the database, false otherwise
-        """
-        chain_metadata = self.__db_collection.find_one(
-            {"chain_name": {"$exists": "true"}}
-        )
-        if chain_metadata is None:
-            log("[*] No metadata found for chain. Creating new colleciton . . .", "w")
-            self.__persist()
-            return False
-
-        self.__name = chain_metadata["chain_name"]
-        self.__owner = chain_metadata["owner"]
-        self.__create_time = chain_metadata["create_time"]
-        self.__modify_time = chain_metadata["modify_time"]
-
-        for block_data in self.__db_collection.find(
-            {"hash_value": {"$exists": "true"}}
-        ):
-            new_block = Block(
-                index=block_data["index"],
-                proof=block_data["proof"],
-                value=block_data["value"],
-                hash_value=block_data["hash_value"],
-                prev_hash=block_data["prev_hash"],
-                create_time=block_data["create_time"],
-                modify_time=block_data["modify_time"],
-            )
-            self.chain.append(new_block)
-        log(f"[+] Restored chain {self.to_dict()}")
-        return True
 
     def hash_block(self, block: Block) -> str:
         """Generate hash of a inputted block
