@@ -47,5 +47,6 @@ class TestBlocks(unittest.TestCase):
             f"Completed block constructor values test in {elapsed_time:.3f} seconds. Created {block}"
         )
 
+
 if __name__ == "__main__":
     unittest.main()

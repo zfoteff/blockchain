@@ -11,3 +11,4 @@ pip-log.txt
 *.cover
 .git
 .pytest_cache
+run_dev_server.sh

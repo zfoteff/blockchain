@@ -2,6 +2,7 @@ __version__ = "1.0.0"
 __author__ = "Zac Foteff"
 
 from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
 
 from resources.constants import *
 from resources.logger import Logger
@@ -52,10 +53,24 @@ class BlockchainDBInterface:
     def db_name(self) -> str:
         return self.__db_name
 
-    def connect():
-        pass
+    def connect(self) -> bool:
+        """Open a connection to the database"""
+        try:
+            self.__db_client = (
+                MongoClient(host=self.__connection_uri)
+                if self.__connection_uri is not None
+                else MongoClient(host=self.__host, port=self.__port)
+            )
+            log("[+] Successfully connected to the database")
+            return True
+        except ConnectionFailure as e:
+            log(f"[-] Failed to open a connection to the database: {e}", "e")
+            return False
 
-    def disconnect():
+    def disconnect(self) -> None:
+        """Close the connection to the database"""
+        self.__db_client.close()
+        log("[+] Sucessfully closed connection to database")
 
     def persist_chain(self, chain: Blockchain) -> None:
         """_summary_

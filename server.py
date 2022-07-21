@@ -3,6 +3,7 @@ __author__ = "Zac Foteff"
 
 import time
 import os
+import sys
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -24,6 +25,7 @@ app.mount(
 
 log = Logger("api")
 cache = dict()  # [Chain name, Chain obj.]
+db_interface = BlockchainDBInterface()
 
 app_start_time = time.time()
 
@@ -47,15 +49,18 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
 
 @app.on_event("startup")
 async def startup():
-    # TODO: Start db client
-
-    log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
+    if db_interface.connect():
+        log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
+    else:
+        log(f"[-X-] Failed to connect to the database. Shutting down . . .")
+        sys.exit(0)
 
 
 @app.on_event("shutdown")
 async def shutdown():
     # TODO: Clear cache
     # TODO: Close connection to db client
+    
 
     log(f"[-X-] Shutdown blockchain application")
 
@@ -115,7 +120,7 @@ async def info_digest() -> JSONResponse:
 
 @app.get(path="/v1/chain/", status_code=200)
 async def get_chain(req: Request) -> JSONResponse:
-    """Retrieve a chain. First check if the chain exists in the cache. If it does not, then 
+    """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
     retrieve it from storage and add it too the cache. Return the serialized chain
 
     Args:
