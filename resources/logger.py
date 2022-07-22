@@ -8,7 +8,7 @@ import logging as log
 LOG_DIR = str(os.getcwd()) + "/logs/"
 
 
-def log_setup(logger_name: str, log_file: str, mode: str = "w"):
+def log_setup(logger_name: str, log_file: str, mode: str = "a"):
     """
     Configure a new logger and return the new instance to the user
 

@@ -6,7 +6,6 @@ import os
 import sys
 
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
 from uvicorn import run
 
@@ -17,11 +16,6 @@ from src.block import Block
 from src.blockchain import Blockchain
 
 app = FastAPI(title="Blockchain Demo")
-app.mount(
-    os.path.join(app.root_path + "/static"),
-    StaticFiles(directory="static"),
-    name="static",
-)
 
 log = Logger("api")
 cache = dict()  # [Chain name, Chain obj.]
@@ -58,10 +52,15 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    # TODO: Clear cache
-    # TODO: Close connection to db client
-    
-
+    """Shutdown event handler. Should:
+    * Disconnect from the database
+    * Persist all dirty chains
+    * Clear the cache
+    * Disconnect from the database
+    """
+    cache = None
+    log(f"[X] Cleared cache")
+    db_interface.disconnect()
     log(f"[-X-] Shutdown blockchain application")
 
 
@@ -72,12 +71,7 @@ async def favicon() -> FileResponse:
     Returns:
         FileResponse: Favicon image
     """
-    file_name = "favicon.ico"
-    file_path = os.path.join(app.root_path, "static")
-    return FileResponse(
-        path=file_path,
-        headers={"Content-Disposition": "attachment; filename=" + file_name},
-    )
+    return FileResponse("/static/favicon.ico")
 
 
 @app.get(path="/", status_code=200)

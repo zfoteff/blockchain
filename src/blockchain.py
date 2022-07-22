@@ -21,15 +21,20 @@ class Blockchain:
         self,
         name: str = DEFAULT_CHAIN_NAME,
         owner: str = DEFAULT_CHAIN_OWNER,
+        chain: list = None,
         create_time: float = time.time(),
         modify_time: float = time.time(),
     ) -> None:
         self.__name = name
         self.__owner = owner
-        self.__chain = list()
-        self.__pending_transactions = list()
+        self.__chain = chain
         self.__create_time = create_time
         self.__modify_time = modify_time
+        self.__pending_transactions = list()
+
+        if self.__chain is None:
+            self.__chain = list()
+            self.__chain.append(Block(0, 0, {}, self.get_current_hash()))
 
     @property
     def name(self) -> str:

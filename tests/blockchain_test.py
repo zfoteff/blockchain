@@ -9,7 +9,7 @@ from resources.logger import Logger
 from src.block import Block
 from src.blockchain import Blockchain
 
-log = Logger("blockchainTest")
+log = Logger("blockchain_test")
 
 
 class TestBlockChain(unittest.TestCase):
@@ -54,10 +54,9 @@ class TestBlockChain(unittest.TestCase):
         start_time = time.perf_counter()
         test_chain_name = "TestChain"
         test_chain_owner = "test owner"
-        chain = Blockchain(test_chain_name, test_chain_owner)
+        chain = Blockchain(name=test_chain_name, owner=test_chain_owner)
         self.assertIsNotNone(chain.chain)
         self.assertIsNotNone(chain.chain[0])
-        self.assertIsInstance(chain.chain[0], Block)
         chain = Blockchain(test_chain_name, test_chain_owner)
         elapsed_time = time.perf_counter() - start_time
         log(

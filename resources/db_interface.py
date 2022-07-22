@@ -70,7 +70,7 @@ class BlockchainDBInterface:
     def disconnect(self) -> None:
         """Close the connection to the database"""
         self.__db_client.close()
-        log("[+] Sucessfully closed connection to database")
+        log("[X] Sucessfully closed connection to database")
 
     def persist_chain(self, chain: Blockchain) -> None:
         """_summary_
