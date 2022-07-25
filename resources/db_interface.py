@@ -61,16 +61,16 @@ class BlockchainDBInterface:
                 if self.__connection_uri is not None
                 else MongoClient(host=self.__host, port=self.__port)
             )
-            log("[+] Successfully connected to the database")
+            log("[-+-] Successfully connected to the database")
             return True
         except ConnectionFailure as e:
-            log(f"[-] Failed to open a connection to the database: {e}", "e")
+            log(f"[-X-] Failed to open a connection to the database: {e}", "e")
             return False
 
     def disconnect(self) -> None:
         """Close the connection to the database"""
         self.__db_client.close()
-        log("[X] Sucessfully closed connection to database")
+        log("[-X-] Sucessfully closed connection to database")
 
     def persist_chain(self, chain: Blockchain) -> None:
         """_summary_

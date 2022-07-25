@@ -47,7 +47,7 @@ async def startup():
         log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
     else:
         log(f"[-X-] Failed to connect to the database. Shutting down . . .")
-        sys.exit(0)
+        sys.exit(1)
 
 
 @app.on_event("shutdown")
@@ -59,7 +59,7 @@ async def shutdown():
     * Disconnect from the database
     """
     cache = None
-    log(f"[X] Cleared cache")
+    log(f"[-X-] Cleared cache")
     db_interface.disconnect()
     log(f"[-X-] Shutdown blockchain application")
 
@@ -71,7 +71,7 @@ async def favicon() -> FileResponse:
     Returns:
         FileResponse: Favicon image
     """
-    return FileResponse("/static/favicon.ico")
+    return FileResponse("static/favicon.ico")
 
 
 @app.get(path="/", status_code=200)
@@ -92,7 +92,7 @@ async def index() -> JSONResponse:
     )
 
 
-@app.get(path="/v1/info/", status_code=200)
+@app.get(path="/info/", status_code=200)
 async def info_digest() -> JSONResponse:
     """Return a digest of information about the health of the server + the current state of
     the blockchain
@@ -110,6 +110,15 @@ async def info_digest() -> JSONResponse:
             "cache": [chain.metadata() for chain in cache.values()],
         },
     )
+    
+@app.get(path="/info/health", status_code=200)
+async def health() -> JSONResponse:
+    """Return a summary of the application health. Should ping services like the database 
+    and other microservices involved in the application
+
+    Returns:
+        JSONResponse: _description_
+    """
 
 
 @app.get(path="/v1/chain/", status_code=200)
