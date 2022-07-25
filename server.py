@@ -1,24 +1,30 @@
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Zac Foteff"
 
 import time
+import os
+import sys
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from uvicorn import run
 
-from bin.constants import *
-from bin.logger import Logger
+from resources.constants import *
+from resources.logger import Logger
+from resources.db_interface import BlockchainDBInterface
 from src.block import Block
 from src.blockchain import Blockchain
 
 app = FastAPI(title="Blockchain Demo")
+
 log = Logger("api")
-cache = dict()
+cache = dict()  # [Chain name, Chain obj.]
+db_interface = BlockchainDBInterface()
+
 app_start_time = time.time()
-log("[-+-] Started listening for events at http://localhost:8000")
 
 
+@staticmethod
 def __pull_chain(chain_name: str) -> Blockchain | None:
     """Retrieve a chain from the fastApi application's cache of active
 
@@ -33,6 +39,39 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
             return chain["chain_obj"]
 
     return None
+
+
+@app.on_event("startup")
+async def startup():
+    if db_interface.connect():
+        log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
+    else:
+        log(f"[-X-] Failed to connect to the database. Shutting down . . .")
+        sys.exit(0)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    """Shutdown event handler. Should:
+    * Disconnect from the database
+    * Persist all dirty chains
+    * Clear the cache
+    * Disconnect from the database
+    """
+    cache = None
+    log(f"[X] Cleared cache")
+    db_interface.disconnect()
+    log(f"[-X-] Shutdown blockchain application")
+
+
+@app.get(path="/favicon.ico", status_code=200, include_in_schema=False)
+async def favicon() -> FileResponse:
+    """Return favicon for the application page
+
+    Returns:
+        FileResponse: Favicon image
+    """
+    return FileResponse("/static/favicon.ico")
 
 
 @app.get(path="/", status_code=200)
@@ -75,14 +114,19 @@ async def info_digest() -> JSONResponse:
 
 @app.get(path="/v1/chain/", status_code=200)
 async def get_chain(req: Request) -> JSONResponse:
-    """_summary_
+    """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
+    retrieve it from storage and add it too the cache. Return the serialized chain
 
     Args:
-        req (Request): _description_
+        req (Request): Request containing infomation about the requested chain. The
+        body should contain
+        - The chain name
+        - The chain owner (optional)
     Returns:
-        JSONResponse: _description_
+        JSONResponse: Serialized chain
     """
-    return JSONResponse(status_code=501)
+    # TODO: Validate chain
+    return JSONResponse(status_code=501, content={})
 
 
 @app.post(path="/v1/register_chain/", status_code=201)
@@ -94,7 +138,7 @@ async def register_chain(req: Request) -> JSONResponse:
         req (Request): Request containing the chain information.
         the body should contain
         - The chain name
-        - Teh chain owner
+        - The chain owner
     Returns:
         JSONResponse: Return a status object to the user indicating the new status of the
         chain
@@ -126,6 +170,8 @@ async def get_block(req: Request) -> JSONResponse:
     Returns:
         JSONResponse: _description_
     """
+
+    # TODO: Return a single block from requested chain
     pass
 
 
@@ -157,7 +203,7 @@ async def create_block(req: Request) -> JSONResponse:
         or body["block_value"] is None
         or body["block_proof"] is None
     ):
-        #   If body parameters do not include 
+        #   If body parameters do not include
         return JSONResponse(
             status_code=400,
             content={
@@ -196,4 +242,4 @@ async def create_block(req: Request) -> JSONResponse:
 
 
 if __name__ == "__main__":
-    run(app, host="127.0.0.1", port=8000)
+    run(app)

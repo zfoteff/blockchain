@@ -4,7 +4,6 @@
 **/__pycache__/
 __pycache__/
 /tests
-/logs/*
 pip-log.txt
 *.pyc
 *.pyo
@@ -12,3 +11,4 @@ pip-log.txt
 *.cover
 .git
 .pytest_cache
+run_dev_server.sh

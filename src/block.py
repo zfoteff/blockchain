@@ -15,7 +15,7 @@ class Block:
         self,
         index: int = 0,
         proof: float = 0.0,
-        value=None,
+        value: dict = None,
         hash_value: str = None,
         prev_hash: str = None,
         create_time: float = time.time(),

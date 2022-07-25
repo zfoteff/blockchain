@@ -9,9 +9,9 @@ DEFAULT_COLLECTION_NAME = "orphan_blocks"
 DEFAULT_DATABASE_NAME = "chain_data"
 
 #   Local Database Constants
-DEV_MONGO_HOST = os.environ['DEV_MONGO_HOST']
-DEV_MONGO_PORT = os.environ['DEV_MONGO_PORT']
-DEV_MONGO_URL = os.environ['DEV_MONGO_URL']
+DEV_MONGO_HOST = os.environ["DEV_MONGO_HOST"]
+DEV_MONGO_PORT = int(os.environ["DEV_MONGO_PORT"])
+DEV_MONGO_URL = os.environ["DEV_MONGO_URL"]
 
 #   Block constants
 

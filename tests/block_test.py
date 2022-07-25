@@ -4,11 +4,12 @@ __author__ = "Zac Foteff"
 import random
 import time
 import unittest
-from bin.constants import *
-from bin.logger import Logger
+
+from resources.constants import *
+from resources.logger import Logger
 from src.block import Block
 
-logger = Logger("./block")
+logger = Logger("block_test")
 
 
 class TestBlocks(unittest.TestCase):
@@ -46,6 +47,7 @@ class TestBlocks(unittest.TestCase):
         logger.log(
             f"Completed block constructor values test in {elapsed_time:.3f} seconds. Created {block}"
         )
+
 
 if __name__ == "__main__":
     unittest.main()

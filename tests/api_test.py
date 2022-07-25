@@ -9,7 +9,7 @@ import unittest
 from server import app
 from fastapi.testclient import TestClient
 
-from bin.logger import Logger
+from resources.logger import Logger
 
 log = Logger("apiTest")
 
@@ -50,6 +50,7 @@ class TestAppCache(unittest.TestCase):
         log(
             f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}"
         )
+
 
 if __name__ == "__main__":
     unittest.main()
