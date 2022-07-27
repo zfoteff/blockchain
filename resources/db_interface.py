@@ -92,6 +92,11 @@ class BlockchainDBInterface:
             )
             collection = self.__db_client.create_collection(chain.name)
             
+        for block in chain.chain:
+            if block.dirty:
+                
+                
+            
         
 
 
