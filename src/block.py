@@ -18,6 +18,7 @@ class Block:
         value: dict = None,
         hash_value: str = None,
         prev_hash: str = None,
+        dirty: bool = True,
         create_time: float = time.time(),
         modify_time: float = time.time(),
     ) -> None:
@@ -39,6 +40,7 @@ class Block:
         self.__modify_time = modify_time
         self.__hash_value = hash_value
         self.__prev_hash = prev_hash
+        self.__dirty = dirty
 
     @property
     def index(self) -> int:
@@ -88,6 +90,14 @@ class Block:
     @modify_time.setter
     def modify_time(self, modify_time: float) -> None:
         self.__modify_time = modify_time
+        
+    @property
+    def dirty(self) -> bool:
+        return self.__dirty
+    
+    @dirty.setter
+    def dirty(self, dirty) -> None:
+        self.__dirty = dirty
 
     def metadata(self) -> dict:
         """Return metadata digest of block object

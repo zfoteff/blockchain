@@ -41,13 +41,13 @@ class BlockchainDBInterface:
         self.__connection_uri = connection_uri
         self.__db_client = None
 
-        self.__db_client = (
+        self.__db = (
             MongoClient(host=connection_uri)
             if connection_uri is not None
             else MongoClient(host=host, port=port)
         )
 
-        self.__db_client = self.__db_client.get_database(self.__db_name)
+        self.__db_client = self.__db.get_database(self.__db_name)
 
     @property
     def db_name(self) -> str:
@@ -73,7 +73,7 @@ class BlockchainDBInterface:
         log("[-X-] Sucessfully closed connection to database")
 
     def persist_chain(self, chain: Blockchain) -> None:
-        """_summary_
+        """Persist a chain to the database
 
         Args:
             chain (Blockchain): Chain that should be persisted to the database.
@@ -81,17 +81,19 @@ class BlockchainDBInterface:
             chains will be updated from the pending transactions.
         """
 
-        self.__db_collection = self.__db.get_collection(self.__db_collection_name)
+        log(f"[*] Persisting chain {str(chain)} to the database")
+        collection = self.__db_client.get_collection(chain.name)
 
-        if self.__db_collection is None:
+        if collection is None:
             #   If collection does not exist in the DB, create the collection
             log(
-                f"[-] Cannot find collection {self.db_collection_name}. Creating . . .",
+                f"[-] Cannot find collection for chain {chain.name}. Creating . . .",
                 "w",
             )
-            self.db_collection_name = self.__db.create_collection(
-                self.__db_collection_name
-            )
+            collection = self.__db_client.create_collection(chain.name)
+            
+        
+
 
     @staticmethod
     def restore_chain(self, chain: Blockchain) -> None:

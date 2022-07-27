@@ -111,20 +111,24 @@ async def info_digest() -> JSONResponse:
         },
     )
     
+    
 @app.get(path="/info/health", status_code=200)
 async def health() -> JSONResponse:
     """Return a summary of the application health. Should ping services like the database 
     and other microservices involved in the application
+    TODO Finish description
+    TODO Create and return health response
 
     Returns:
         JSONResponse: _description_
     """
+    pass
 
 
 @app.get(path="/v1/chain/", status_code=200)
 async def get_chain(req: Request) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
-    retrieve it from storage and add it too the cache. Return the serialized chain
+    retrieve it from the database and add it too the cache. Return the serialized chain
 
     Args:
         req (Request): Request containing infomation about the requested chain. The
@@ -134,14 +138,15 @@ async def get_chain(req: Request) -> JSONResponse:
     Returns:
         JSONResponse: Serialized chain
     """
-    # TODO: Validate chain
+    # TODO Validate body
     return JSONResponse(status_code=501, content={})
 
 
 @app.post(path="/v1/register_chain/", status_code=201)
 async def register_chain(req: Request) -> JSONResponse:
     """Register chain to the applications cache of chains the applications stores
-    TODO: complete the chain object so that it can return the proper data on request
+    TODO complete the chain object so that it can return the proper data on request
+    TODO Add the chain to the cache
 
     Args:
         req (Request): Request containing the chain information.
@@ -180,7 +185,8 @@ async def get_block(req: Request) -> JSONResponse:
         JSONResponse: _description_
     """
 
-    # TODO: Return a single block from requested chain
+    # TODO Return a single block from requested chain
+    
     pass
 
 
@@ -212,7 +218,7 @@ async def create_block(req: Request) -> JSONResponse:
         or body["block_value"] is None
         or body["block_proof"] is None
     ):
-        #   If body parameters do not include
+        #   If body parameters are invalid
         return JSONResponse(
             status_code=400,
             content={
@@ -243,8 +249,9 @@ async def create_block(req: Request) -> JSONResponse:
         value=body["block_value"],
         proof=body["block_proof"],
     )
+    
     chain.append_block(block)
-    log(f"[+] Inserted {block} into chain {chain}")
+    log(f"[+] Inserted {block} into chain {chain}", "d")
     return JSONResponse(
         status_code=201, content={"result": "Success", "created": str(block)}
     )

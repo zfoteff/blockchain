@@ -1,4 +1,3 @@
-import string
 from pydantic import BaseModel
 
 
@@ -14,6 +13,10 @@ class BlockModel(BaseModel):
 
 class BlockChainModel(BaseModel):
     name: str
-    owner: str
-    create_time: float
-    modify_time: float
+    owner: str | None
+    create_time: float | None
+    modify_time: float | None
+
+class BlockRequestModel(BaseModel):
+    hash_value: str | None
+    proof: float | None

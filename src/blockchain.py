@@ -34,7 +34,7 @@ class Blockchain:
 
         if self.__chain is None:
             self.__chain = list()
-            self.__chain.append(Block(0, 0, {}, self.get_current_hash()))
+            self.__chain.append(Block(0, 0, {"value": "genesis"}, self.get_current_hash()))
 
     @property
     def name(self) -> str:
@@ -155,7 +155,7 @@ class Blockchain:
         }
 
     def __str__(self) -> str:
-        return f"{self.__name} (Owner: {self.__owner}) {[str(block) for block in self.__chain]}"
+        return f"{self.__name} (Owner: {self.__owner}) {[block.hash_value for block in self.__chain]}"
 
     def __len__(self) -> int:
         return len(self.__chain)
