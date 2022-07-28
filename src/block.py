@@ -90,11 +90,11 @@ class Block:
     @modify_time.setter
     def modify_time(self, modify_time: float) -> None:
         self.__modify_time = modify_time
-        
+
     @property
     def dirty(self) -> bool:
         return self.__dirty
-    
+
     @dirty.setter
     def dirty(self, dirty) -> None:
         self.__dirty = dirty
@@ -119,7 +119,7 @@ class Block:
             dict: JSON digest of the block object
         """
         return {
-            "index": self.__index,
+            "_id": self.__index,
             "value": self.__value,
             "proof": self.__proof,
             "hash_value": self.__hash_value,

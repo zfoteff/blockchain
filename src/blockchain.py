@@ -34,7 +34,9 @@ class Blockchain:
 
         if self.__chain is None:
             self.__chain = list()
-            self.__chain.append(Block(0, 0, {"value": "genesis"}, self.get_current_hash()))
+            self.__chain.append(
+                Block(0, 0, {"value": "genesis"}, self.get_current_hash())
+            )
 
     @property
     def name(self) -> str:
@@ -95,6 +97,20 @@ class Blockchain:
             self.__persist()
             return True
         return False
+
+    def is_valid(self) -> Block | bool:
+        """Ensure that the chain is valid. A chain is valid if every
+        block has a hash, its previous hash matches the block that proceeds
+        it, and its hash matches the prev_hash of the value that
+        superceeds it
+
+        Returns:
+            Block | bool: Return the first invalid block in the chain
+            if there is an error, otherwise returns True
+        """
+        # TODO Ensure that the first block is the genesis block
+        # TODO Ensure that all the hashes match up 
+        pass
 
     def get_last_block(self) -> Block | None:
         """Retrieve the last inserted block in the chain

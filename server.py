@@ -2,7 +2,6 @@ __version__ = "1.1.0"
 __author__ = "Zac Foteff"
 
 import time
-import os
 import sys
 
 from fastapi import FastAPI, Request

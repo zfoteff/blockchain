@@ -81,7 +81,7 @@ class BlockchainDBInterface:
             chains will be updated from the pending transactions.
         """
 
-        log(f"[*] Persisting chain {str(chain)} to the database")
+        log(f"[*] Persisting chain {chain.name} to the database")
         collection = self.__db_client.get_collection(chain.name)
 
         if collection is None:
@@ -91,21 +91,32 @@ class BlockchainDBInterface:
                 "w",
             )
             collection = self.__db_client.create_collection(chain.name)
-            
+        else:
+            log(f"[*] Found collection for chain {chain.name}", "d")
+
+        # TODO Should ensure validity of chain before persisting blocks
+        #        if !chain.is_valid():
+        #            log(error)
+
         for block in chain.chain:
+            # NOTE Currently iterates through entire chain to find dirty blocks (inefficient)
+            # TODO Refactor to persist from a given chain's pending transactions
             if block.dirty:
-                
-                
-            
-        
+                log(
+                    f"\n[+] Persisted block {str(block)} to the {chain.name} collection",
+                    "d",
+                )
+                collection.insert_one(block.to_dict())
+                block.dirty = False
 
+        log(f"[+] Persisted chain {chain.name}")
 
-    @staticmethod
-    def restore_chain(self, chain: Blockchain) -> None:
+    def restore_chain(self, chain: Blockchain) -> bool:
         """_summary_
-
         Args:
             chain (Blockchain): Chain that should be restored from the database. Chains that
             do not exist will throw an error
+        Returns:
+            bool: True if chain is successfully restored, false otherwise
         """
-        pass
+        
