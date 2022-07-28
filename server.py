@@ -6,24 +6,23 @@ import sys
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
-from uvicorn import run
 
 from resources.constants import *
 from resources.logger import Logger
 from resources.db_interface import BlockchainDBInterface
+from src.models import BlockChainModel, BlockRequestModel, BlockModel
 from src.block import Block
 from src.blockchain import Blockchain
 
-app = FastAPI(title="Blockchain Demo")
 
 log = Logger("api")
 cache = dict()  # [Chain name, Chain obj.]
 db_interface = BlockchainDBInterface()
 
+app = FastAPI(title="Blockchain Demo")
 app_start_time = time.time()
 
 
-@staticmethod
 def __pull_chain(chain_name: str) -> Blockchain | None:
     """Retrieve a chain from the fastApi application's cache of active
 
@@ -43,7 +42,7 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
 @app.on_event("startup")
 async def startup():
     if db_interface.connect():
-        log(f"[-+-] Started listening for events at: http://127.0.0.1:8080")
+        log(f"[-+-] Started listening for events at: http://127.0.0.1:8000")
     else:
         log(f"[-X-] Failed to connect to the database. Shutting down . . .")
         sys.exit(1)
@@ -63,7 +62,7 @@ async def shutdown():
     log(f"[-X-] Shutdown blockchain application")
 
 
-@app.get(path="/favicon.ico", status_code=200, include_in_schema=False)
+@app.get("/favicon.ico", status_code=200, include_in_schema=False)
 async def favicon() -> FileResponse:
     """Return favicon for the application page
 
@@ -73,7 +72,7 @@ async def favicon() -> FileResponse:
     return FileResponse("static/favicon.ico")
 
 
-@app.get(path="/", status_code=200)
+@app.get("/", status_code=200)
 async def index() -> JSONResponse:
     """Root endpoint for blockchain interactions
 
@@ -91,7 +90,7 @@ async def index() -> JSONResponse:
     )
 
 
-@app.get(path="/info/", status_code=200)
+@app.get("/info/", status_code=200)
 async def info_digest() -> JSONResponse:
     """Return a digest of information about the health of the server + the current state of
     the blockchain
@@ -109,11 +108,11 @@ async def info_digest() -> JSONResponse:
             "cache": [chain.metadata() for chain in cache.values()],
         },
     )
-    
-    
-@app.get(path="/info/health", status_code=200)
+
+
+@app.get("/info/health/", status_code=200)
 async def health() -> JSONResponse:
-    """Return a summary of the application health. Should ping services like the database 
+    """Return a summary of the application health. Should ping services like the database
     and other microservices involved in the application
     TODO Finish description
     TODO Create and return health response
@@ -124,8 +123,8 @@ async def health() -> JSONResponse:
     pass
 
 
-@app.get(path="/v1/chain/", status_code=200)
-async def get_chain(req: Request) -> JSONResponse:
+@app.get("/v1/chain/", status_code=200)
+async def get_chain(req: BlockChainModel) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
     retrieve it from the database and add it too the cache. Return the serialized chain
 
@@ -141,7 +140,7 @@ async def get_chain(req: Request) -> JSONResponse:
     return JSONResponse(status_code=501, content={})
 
 
-@app.post(path="/v1/register_chain/", status_code=201)
+@app.post("/v1/chain/", status_code=201)
 async def register_chain(req: Request) -> JSONResponse:
     """Register chain to the applications cache of chains the applications stores
     TODO complete the chain object so that it can return the proper data on request
@@ -171,8 +170,8 @@ async def register_chain(req: Request) -> JSONResponse:
     )
 
 
-@app.post(path="/v1/block/", status_code=201)
-async def get_block(req: Request) -> JSONResponse:
+@app.get("/v1/block/{chain_name}/{hash_value}/{proof}")
+async def get_block(chain_name: str, hash_value: str, proof: float) -> dict:
     """Return a block from a requested chain
 
     Args:
@@ -184,12 +183,15 @@ async def get_block(req: Request) -> JSONResponse:
         JSONResponse: _description_
     """
 
+    # TODO Check if the chain is in the cache
+    #   If not, retrieve the chain and add it to the cache
     # TODO Return a single block from requested chain
-    
-    pass
+
+    log(f"Block request {chain_name} {hash_value} {proof}")
+    return {}
 
 
-@app.post(path="/v1/block/", status_code=201)
+@app.post("/v1/block/", status_code=201)
 async def create_block(req: Request) -> JSONResponse:
     """Create a new block in a selected chain
 
@@ -248,7 +250,7 @@ async def create_block(req: Request) -> JSONResponse:
         value=body["block_value"],
         proof=body["block_proof"],
     )
-    
+
     chain.append_block(block)
     log(f"[+] Inserted {block} into chain {chain}", "d")
     return JSONResponse(
@@ -257,4 +259,5 @@ async def create_block(req: Request) -> JSONResponse:
 
 
 if __name__ == "__main__":
-    run(app)
+    from uvicorn import run
+    run(app, host="127.0.0.1", port=8000, log_level="debug")

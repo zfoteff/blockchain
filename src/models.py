@@ -18,5 +18,6 @@ class BlockChainModel(BaseModel):
     modify_time: float | None
 
 class BlockRequestModel(BaseModel):
-    hash_value: str | None
-    proof: float | None
+    chain_name: str 
+    hash_value: str
+    proof: float
