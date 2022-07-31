@@ -38,6 +38,18 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
 
     return None
 
+def __cache_chain(chain: Blockchain) -> bool:
+    """Adds a chain to the cache. The cache should be limited to 25 chains.
+    If a new chain is pushed to a full cache, the oldest chain should be removed from the cache.
+    The chain's modified_date should be the bases for the age of the chain in the cache. The 
+    chain should not be added to the cache if an instance already exists there
+
+    Args:
+        chain (Blockchain): Chain that should be added to the cache
+    Returns:
+        bool: _description_
+    """
+    
 
 @app.on_event("startup")
 async def startup():
@@ -124,20 +136,27 @@ async def health() -> JSONResponse:
 
 
 @app.get("/v1/chain/", status_code=200)
-async def get_chain(req: BlockChainModel) -> JSONResponse:
+async def get_chain(chain_name: str) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
     retrieve it from the database and add it too the cache. Return the serialized chain
 
     Args:
-        req (Request): Request containing infomation about the requested chain. The
-        body should contain
-        - The chain name
-        - The chain owner (optional)
+        chain_name (str): Name of the chain the request is seeking to find
+
     Returns:
-        JSONResponse: Serialized chain
+        JSONResponse: _description_
     """
-    # TODO Validate body
-    return JSONResponse(status_code=501, content={})
+    # TODO Validate query params
+    # TODO Retrieve chain from cache / database
+    # TODO Add chain to cache if necessary
+
+    chain = __pull_chain(chain_name=chain_name)
+
+    if chain is None:
+        #   Chain is not in database -> restore from db
+        pass
+
+    return JSONResponse(status_code=200, content={"Chain name": chain_name})
 
 
 @app.post("/v1/chain/", status_code=201)
@@ -170,7 +189,7 @@ async def register_chain(req: Request) -> JSONResponse:
     )
 
 
-@app.get("/v1/block/{chain_name}/{hash_value}/{proof}")
+@app.get("/v1/block/")
 async def get_block(chain_name: str, hash_value: str, proof: float) -> dict:
     """Return a block from a requested chain
 
@@ -260,4 +279,5 @@ async def create_block(req: Request) -> JSONResponse:
 
 if __name__ == "__main__":
     from uvicorn import run
+
     run(app, host="127.0.0.1", port=8000, log_level="debug")
