@@ -49,6 +49,21 @@ def __cache_chain(chain: Blockchain) -> bool:
     Returns:
         bool: _description_
     """
+    if __pull_chain(chain.name) is not None:
+        #   If the chain already exists in the cache -> exit the function
+        log("[*] The chain already exists in the cache . . .", "w")
+        return False
+
+
+    if len(cache) >= 25:
+        # TODO Add logic to remove the oldest 
+        pass
+
+    else:
+        cache[chain.name] = chain
+        log(f"[-+-] Added chain {str(chain)} to the cache")
+    
+    return True
     
 
 @app.on_event("startup")
