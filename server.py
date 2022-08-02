@@ -39,10 +39,11 @@ def __pull_chain(chain_name: str) -> Blockchain | None:
 
     return None
 
+
 def __cache_chain(chain: Blockchain) -> bool:
     """Adds a chain to the cache. The cache should be limited to 25 chains.
     If a new chain is pushed to a full cache, the oldest chain should be removed from the cache.
-    The chain's modified_date should be the bases for the age of the chain in the cache. The 
+    The chain's modified_date should be the bases for the age of the chain in the cache. The
     chain should not be added to the cache if an instance already exists there
 
     Args:
@@ -55,17 +56,16 @@ def __cache_chain(chain: Blockchain) -> bool:
         log("[*] The chain already exists in the cache . . .", "w")
         return False
 
-
     if len(cache) >= 25:
-        # TODO Add logic to remove the oldest 
+        # TODO Add logic to remove the oldest
         pass
 
     else:
         cache[chain.name] = chain
         log(f"[-+-] Added chain {str(chain)} to the cache")
-    
+
     return True
-    
+
 
 @app.on_event("startup")
 async def startup():
@@ -221,8 +221,25 @@ async def get_block(chain_name: str, hash_value: str, proof: float) -> JSONRespo
     # TODO Check if the chain is in the cache
     #   If not, retrieve the chain and add it to the cache
     # TODO Return a single block from requested chain
-
-    return JSONResponse(status_code=200, content={"chain_name": chain_name, "hash_value": hash_value, "proof": proof})
+    
+    if chain_name not in cache:
+        #   TODO Check if the chain can be retrieved from the database, if it can't return error
+        return JSONResponse(status_code=401, content={"result": "ERROR", "reason": "chain does not exist "})
+    
+    requested_block = None
+    chain = cache[chain_name]
+    for block in chain.chain:
+        if block.hash == hash_value and block.proof == proof:
+            requested_block = block
+            
+    if requested_block is None:
+        # TODO Requested block doesn't exist
+        return JSONResponse(status_code=404, content={})
+    
+    return JSONResponse(
+        status_code=200,
+        content={"result": "SUCCESS", "block": str(block)},
+    )
 
 
 @app.post("/v1/block/", status_code=201)
