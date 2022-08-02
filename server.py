@@ -1,6 +1,7 @@
 __version__ = "1.1.0"
 __author__ = "Zac Foteff"
 
+from itertools import chain
 import time
 import sys
 
@@ -205,7 +206,7 @@ async def register_chain(req: Request) -> JSONResponse:
 
 
 @app.get("/v1/block/")
-async def get_block(chain_name: str, hash_value: str, proof: float) -> dict:
+async def get_block(chain_name: str, hash_value: str, proof: float) -> JSONResponse:
     """Return a block from a requested chain
 
     Args:
@@ -221,8 +222,7 @@ async def get_block(chain_name: str, hash_value: str, proof: float) -> dict:
     #   If not, retrieve the chain and add it to the cache
     # TODO Return a single block from requested chain
 
-    log(f"Block request {chain_name} {hash_value} {proof}")
-    return {}
+    return JSONResponse(status_code=200, content={"chain_name": chain_name, "hash_value": hash_value, "proof": proof})
 
 
 @app.post("/v1/block/", status_code=201)
@@ -295,4 +295,4 @@ async def create_block(req: Request) -> JSONResponse:
 if __name__ == "__main__":
     from uvicorn import run
 
-    run(app, host="127.0.0.1", port=8000, log_level="debug")
+    run(app, host="127.0.0.1", port=8080, log_level="debug")
