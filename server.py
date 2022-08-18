@@ -224,7 +224,7 @@ async def get_block(chain_name: str, hash_value: str, proof: float) -> JSONRespo
     
     if chain_name not in cache:
         #   TODO Check if the chain can be retrieved from the database, if it can't return error
-        return JSONResponse(status_code=401, content={"result": "ERROR", "reason": "chain does not exist "})
+        return JSONResponse(status_code=400, content={"result": "ERROR", "reason": "chain does not exist "})
     
     requested_block = None
     chain = cache[chain_name]
