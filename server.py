@@ -152,9 +152,16 @@ async def health() -> JSONResponse:
 
 
 @app.get("/v1/chain/", status_code=200, tags=["Chain Methods"])
-async def get_chain(chain_name: str) -> JSONResponse:
+async def get_chain(
+    chain_name: str = Query(
+        default="null", 
+        title="Chain Name", 
+        alias="chain_name", 
+        example="zchain"
+    )
+) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
-    retrieve it from the database and add it too the cache. Return the serialized chain
+    retrieve it from the database and add it too the cache. Should return the serialized chain
 
     Args:
         chain_name (str): Name of the chain the request is seeking to find
@@ -214,10 +221,15 @@ async def get_block(
     hash_value: str,
     parent_chain: str = Query(
         default="null",
+        title="Parent chain",
         alias="parent_chain",
         example="zchain",
     ),
-    proof: str = Query(default=0.0, alias="proof", example=1.0234),
+    proof: str = Query(
+        default=0.0, 
+        title="Proof", 
+        alias="proof", 
+        example=1.0234),
 ) -> JSONResponse:
     """Return a block from a requested chain
 
@@ -233,14 +245,13 @@ async def get_block(
     # TODO Check if the chain is in the cache
     #   If not, retrieve the chain and add it to the cache
     # TODO Return a single block from requested chain
-    
+
     if parent_chain not in cache:
         #   TODO Check if the chain can be retrieved from the database, if it can't return error
         return JSONResponse(
             status_code=400,
             content={"result": "ERROR", "reason": "Parent chain does not exist"},
         )
-        
 
     chain = cache[parent_chain]
     # TODO Error if the chain does not exist in the cache or the database
