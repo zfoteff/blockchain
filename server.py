@@ -1,17 +1,16 @@
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Zac Foteff"
 
-from itertools import chain
 import time
 import sys
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse, FileResponse
 
 from resources.constants import *
 from resources.logger import Logger
 from resources.db_interface import BlockchainDBInterface
-from src.models import BlockChainModel, BlockRequestModel, BlockModel
+from src.models import BlockChainModel, BlockModel
 from src.block import Block
 from src.blockchain import Blockchain
 
@@ -88,19 +87,10 @@ async def shutdown():
     log(f"[-X-] Cleared cache")
     db_interface.disconnect()
     log(f"[-X-] Shutdown blockchain application")
+    sys.exit(0)
 
 
-@app.get("/favicon.ico", status_code=200, include_in_schema=False)
-async def favicon() -> FileResponse:
-    """Return favicon for the application page
-
-    Returns:
-        FileResponse: Favicon image
-    """
-    return FileResponse("static/favicon.ico")
-
-
-@app.get("/", status_code=200)
+@app.get("/", status_code=200, include_in_schema=False)
 async def index() -> JSONResponse:
     """Root endpoint for blockchain interactions
 
@@ -118,7 +108,17 @@ async def index() -> JSONResponse:
     )
 
 
-@app.get("/info/", status_code=200)
+@app.get("/favicon.ico", status_code=200, include_in_schema=False)
+async def favicon() -> FileResponse:
+    """Return favicon for the application page
+
+    Returns:
+        FileResponse: Favicon image
+    """
+    return FileResponse("static/favicon.ico")
+
+
+@app.get("/info/", status_code=200, tags=["Monitoring"])
 async def info_digest() -> JSONResponse:
     """Return a digest of information about the health of the server + the current state of
     the blockchain
@@ -138,7 +138,7 @@ async def info_digest() -> JSONResponse:
     )
 
 
-@app.get("/info/health/", status_code=200)
+@app.get("/info/health/", status_code=200, tags=["Monitoring"])
 async def health() -> JSONResponse:
     """Return a summary of the application health. Should ping services like the database
     and other microservices involved in the application
@@ -151,7 +151,7 @@ async def health() -> JSONResponse:
     pass
 
 
-@app.get("/v1/chain/", status_code=200)
+@app.get("/v1/chain/", status_code=200, tags=["Chain Methods"])
 async def get_chain(chain_name: str) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
     retrieve it from the database and add it too the cache. Return the serialized chain
@@ -160,7 +160,7 @@ async def get_chain(chain_name: str) -> JSONResponse:
         chain_name (str): Name of the chain the request is seeking to find
 
     Returns:
-        JSONResponse: _description_
+        JSONResponse: JSON representation of the chain
     """
     # TODO Validate query params
     # TODO Retrieve chain from cache / database
@@ -169,14 +169,14 @@ async def get_chain(chain_name: str) -> JSONResponse:
     chain = __pull_chain(chain_name=chain_name)
 
     if chain is None:
-        #   Chain is not in database -> restore from db
+        #   TODO Chain is not in database -> restore from db
         pass
 
     return JSONResponse(status_code=200, content={"Chain name": chain_name})
 
 
-@app.post("/v1/chain/", status_code=201)
-async def register_chain(req: Request) -> JSONResponse:
+@app.post("/v1/chain/", status_code=201, tags=["Chain Methods"])
+async def register_chain(req_chain: BlockChainModel) -> JSONResponse:
     """Register chain to the applications cache of chains the applications stores
     TODO complete the chain object so that it can return the proper data on request
     TODO Add the chain to the cache
@@ -190,23 +190,35 @@ async def register_chain(req: Request) -> JSONResponse:
         JSONResponse: Return a status object to the user indicating the new status of the
         chain
     """
-    body = await req.json()
-    chain = __pull_chain(body["chain_name"])
+
+    chain = __pull_chain(req_chain["name"])
+
     if chain is not None:
         return JSONResponse(
             status_code=400,
             content={"result": "Failed", "reason": "Chain is already registered "},
         )
 
-    chain = Blockchain(name=body["chain_name"], owner=body["chain_owner"])
-    cache[chain.name] = chain
+    chain = Blockchain(name=req_chain["name"], owner=req_chain["owner"])
+    __cache_chain(chain)
+
+    # TODO Persist the new chain to the database
+
     return JSONResponse(
         status_code=201, content={"result": "Success", "chain": str(chain)}
     )
 
 
-@app.get("/v1/block/")
-async def get_block(chain_name: str, hash_value: str, proof: float) -> JSONResponse:
+@app.get("/v1/block/{hash_value}", tags=["Block Methods"])
+async def get_block(
+    hash_value: str,
+    parent_chain: str = Query(
+        default="null",
+        alias="parent_chain",
+        example="zchain",
+    ),
+    proof: str = Query(default=0.0, alias="proof", example=1.0234),
+) -> JSONResponse:
     """Return a block from a requested chain
 
     Args:
@@ -222,28 +234,33 @@ async def get_block(chain_name: str, hash_value: str, proof: float) -> JSONRespo
     #   If not, retrieve the chain and add it to the cache
     # TODO Return a single block from requested chain
     
-    if chain_name not in cache:
+    if parent_chain not in cache:
         #   TODO Check if the chain can be retrieved from the database, if it can't return error
-        return JSONResponse(status_code=400, content={"result": "ERROR", "reason": "chain does not exist "})
-    
-    requested_block = None
-    chain = cache[chain_name]
+        return JSONResponse(
+            status_code=400,
+            content={"result": "ERROR", "reason": "Parent chain does not exist"},
+        )
+        
+
+    chain = cache[parent_chain]
+    # TODO Error if the chain does not exist in the cache or the database
+    # TODO Retreive the chain from the database if it does not exist
+
     for block in chain.chain:
-        if block.hash == hash_value and block.proof == proof:
-            requested_block = block
-            
-    if requested_block is None:
-        # TODO Requested block doesn't exist
-        return JSONResponse(status_code=404, content={})
-    
+        if block.hash == hash_value and block.proof == float(proof):
+            return JSONResponse(
+                status_code=200,
+                content={"result": "SUCCESS", "block": str(block)},
+            )
+
     return JSONResponse(
-        status_code=200,
-        content={"result": "SUCCESS", "block": str(block)},
+        status_code=404,
+        content={"result": "FAILURE", "reason": "Block not found in parent chain"},
     )
 
 
-@app.post("/v1/block/", status_code=201)
-async def create_block(req: Request) -> JSONResponse:
+@app.post("/v1/block/", status_code=201, tags=["Block Methods"])
+async def create_block(block: (BlockModel | None) = None) -> JSONResponse:
     """Create a new block in a selected chain
 
     Args:
@@ -255,57 +272,38 @@ async def create_block(req: Request) -> JSONResponse:
     Returns:
         JSONResponse: Status of block insertion into the chain. 201 if block is created,
         406 if the object cannot be created
+
+    TODO Persist block to the chain
     """
-    body = req.json()
 
     #   Validate the request body
-    if body is None:
+    if block is None:
         #   If no body is submitted, return error response
+        log("Empty body", "d")
         return JSONResponse(
             status_code=400,
             content={"result": "Failure", "reason": "Empty request body"},
         )
-    elif (
-        body["chain"] is None
-        or body["block_value"] is None
-        or body["block_proof"] is None
-    ):
-        #   If body parameters are invalid
-        return JSONResponse(
-            status_code=400,
-            content={
-                "result": "Failure",
-                "reason": "One or more required body values are missing",
-            },
-        )
-    elif (
-        not isinstance(body["chain"], str)
-        or not isinstance(body["block_value"], dict)
-        or not isinstance(body["block_proof"], float)
-    ):
-        return JSONResponse(
-            status_code=400,
-            content={"result": "Failure", "reason": "Incorrect parameter types"},
-        )
 
-    chain_name = body["chain"]
+    chain_name = block["parent_chain"]
     chain = __pull_chain(chain_name)
 
     if chain is None:
         #   If chain isnt in the cache, instantiate a new object and cache it for future use
+        #   TODO Restore the chain from the database
         chain = Blockchain(name=chain_name)
         cache[chain_name] = chain
 
-    block = Block(
-        index=chain.length + 1,
-        value=body["block_value"],
-        proof=body["block_proof"],
+    new_block = Block(
+        index=chain.next_index,
+        value=block["block_value"],
+        proof=block["block_proof"],
     )
 
-    chain.append_block(block)
-    log(f"[+] Inserted {block} into chain {chain}", "d")
+    chain.append_block(new_block)
+    log(f"[+] Inserted {new_block} into chain {chain}", "d")
     return JSONResponse(
-        status_code=201, content={"result": "Success", "created": str(block)}
+        status_code=201, content={"result": "Success", "created": str(new_block)}
     )
 
 

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class BlockModel(BaseModel):
-    index: int
+    parent_chain: str
     proof: float
     value: dict
     hash_value: str
@@ -13,11 +13,4 @@ class BlockModel(BaseModel):
 
 class BlockChainModel(BaseModel):
     name: str
-    owner: str | None
-    create_time: float | None
-    modify_time: float | None
-
-class BlockRequestModel(BaseModel):
-    chain_name: str 
-    hash_value: str
-    proof: float
+    owner: str

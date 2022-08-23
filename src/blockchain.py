@@ -70,6 +70,10 @@ class Blockchain:
     @modify_time.setter
     def modify_time(self, modify_time: float) -> None:
         self.__modify_time = modify_time
+        
+    @property
+    def next_index(self) -> int:
+        return len(self.__chain)
 
     def hash_block(self, block: Block) -> str:
         """Generate hash of a inputted block
