@@ -19,27 +19,37 @@ log = Logger("api")
 cache = dict()  # [Chain name, Chain obj.]
 db_interface = BlockchainDBInterface()
 
-app = FastAPI(title="Blockchain Demo")
+app = FastAPI(
+    title="Blockchain Demo",
+    description="Blockchain demo application",
+    version=__version__,
+)
 app_start_time = time.time()
 
-
-def __pull_chain(chain_name: str) -> Blockchain | None:
-    """Retrieve a chain from the fastApi application's cache of active
+def pull_chain(chain_name: str) -> Blockchain | None:
+    """Retrieve a chain from storage. Checks if the chain exists in the cache, then attempts
+    to retreive the chain from the database. Returns the found chain, or None
 
     Args:
-        chain_name (str): Name of the chain to retrieve from the cache
+        chain_name (str): Name of the chain to retrieve from storage
     Returns:
         Blockchain | None: Found blockchain. Returns the chain if one is found, returns
         none if no chain is found with that id
     """
+    #   Check if the chain exists in the cache
     for chain in cache:
         if chain["chain_name"] == chain_name:
+            log("[+] Restored chain from the cache", "d")
             return chain["chain_obj"]
-
+        
+    #   TODO Check if the chain can be restored from storage
+    #   TODO Cache the chain if it is restored from storage
+    
+    #   If the chain cannot be 
     return None
 
 
-def __cache_chain(chain: Blockchain) -> bool:
+def cache_chain(chain: Blockchain) -> bool:
     """Adds a chain to the cache. The cache should be limited to 25 chains.
     If a new chain is pushed to a full cache, the oldest chain should be removed from the cache.
     The chain's modified_date should be the bases for the age of the chain in the cache. The
@@ -50,14 +60,18 @@ def __cache_chain(chain: Blockchain) -> bool:
     Returns:
         bool: _description_
     """
-    if __pull_chain(chain.name) is not None:
+    if pull_chain(chain.name) is not None:
         #   If the chain already exists in the cache -> exit the function
         log("[*] The chain already exists in the cache . . .", "w")
         return False
 
+    #   Remove oldest chain from the cache if there are more than 25 chains in the cache
     if len(cache) >= 25:
-        # TODO Add logic to remove the oldest
-        pass
+        oldest = ("none", None)
+        for chain_name, chain_obj in cache:
+            if chain_obj.modified_date < oldest[1] or oldest[1] == None:
+                oldest = (chain_name, chain_obj.modified_time)
+
 
     else:
         cache[chain.name] = chain
@@ -154,10 +168,7 @@ async def health() -> JSONResponse:
 @app.get("/v1/chain/", status_code=200, tags=["Chain Methods"])
 async def get_chain(
     chain_name: str = Query(
-        default="null", 
-        title="Chain Name", 
-        alias="chain_name", 
-        example="zchain"
+        default="null", title="Chain Name", alias="chain_name", example="zchain"
     )
 ) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
@@ -173,7 +184,7 @@ async def get_chain(
     # TODO Retrieve chain from cache / database
     # TODO Add chain to cache if necessary
 
-    chain = __pull_chain(chain_name=chain_name)
+    chain = pull_chain(chain_name=chain_name)
 
     if chain is None:
         #   TODO Chain is not in database -> restore from db
@@ -198,7 +209,7 @@ async def register_chain(req_chain: BlockChainModel) -> JSONResponse:
         chain
     """
 
-    chain = __pull_chain(req_chain["name"])
+    chain = pull_chain(req_chain["name"])
 
     if chain is not None:
         return JSONResponse(
@@ -207,7 +218,7 @@ async def register_chain(req_chain: BlockChainModel) -> JSONResponse:
         )
 
     chain = Blockchain(name=req_chain["name"], owner=req_chain["owner"])
-    __cache_chain(chain)
+    cache_chain(chain)
 
     # TODO Persist the new chain to the database
 
@@ -225,11 +236,7 @@ async def get_block(
         alias="parent_chain",
         example="zchain",
     ),
-    proof: str = Query(
-        default=0.0, 
-        title="Proof", 
-        alias="proof", 
-        example=1.0234),
+    proof: str = Query(default=0.0, title="Proof", alias="proof", example=1.0234),
 ) -> JSONResponse:
     """Return a block from a requested chain
 
@@ -297,7 +304,7 @@ async def create_block(block: (BlockModel | None) = None) -> JSONResponse:
         )
 
     chain_name = block["parent_chain"]
-    chain = __pull_chain(chain_name)
+    chain = pull_chain(chain_name)
 
     if chain is None:
         #   If chain isnt in the cache, instantiate a new object and cache it for future use
@@ -321,4 +328,4 @@ async def create_block(block: (BlockModel | None) = None) -> JSONResponse:
 if __name__ == "__main__":
     from uvicorn import run
 
-    run(app, host="127.0.0.1", port=8080, log_level="debug")
+    run(app="server:app", log_level="debug", reload=True)

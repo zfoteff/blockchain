@@ -45,11 +45,17 @@ class TestAppCache(unittest.TestCase):
 
     def test_empty_cache(self):
         start_time = time.perf_counter()
-
+        self.client = TestClient(app)
         elapsed_time = time.perf_counter() - start_time
         log(
             f"[+] Completed test to ensure new objects are created with an empty cache in {elapsed_time:.5f}"
         )
+        
+    def test_insert_into_cache(self):
+        start_time = time.perf_counter()
+        
+        elapsed_time = time.perf_counter - start_time
+        log(f"[+] Completed cache insertion test in {elapsed_time:.5f}")
 
 
 if __name__ == "__main__":
