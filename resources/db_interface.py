@@ -15,7 +15,6 @@ class BlockchainDBInterface:
     """
     Interface for MongoDB interactions with the Block Chain
     """
-
     def __init__(
         self,
         db_name: str = DEFAULT_DATABASE_NAME,
@@ -41,17 +40,20 @@ class BlockchainDBInterface:
         self.__connection_uri = connection_uri
         self.__db_client = None
 
-        self.__db = (
+        self.__db_client = (
             MongoClient(host=connection_uri)
             if connection_uri is not None
             else MongoClient(host=host, port=port)
         )
 
-        self.__db_client = self.__db.get_database(self.__db_name)
+        self.__db = self.__db_client.get_database(self.__db_name)
+
 
     @property
     def db_name(self) -> str:
+        """Database name"""
         return self.__db_name
+
 
     def connect(self) -> bool:
         """Open a connection to the database"""
@@ -67,10 +69,12 @@ class BlockchainDBInterface:
             log(f"[-X-] Failed to open a connection to the database: {e}", "e")
             return False
 
+
     def disconnect(self) -> None:
         """Close the connection to the database"""
         self.__db_client.close()
         log("[-X-] Sucessfully closed connection to database")
+
 
     def persist_chain(self, chain: Blockchain) -> None:
         """Persist a chain to the database
@@ -80,7 +84,6 @@ class BlockchainDBInterface:
             New chains will create a new collection in the DB. The data for existing
             chains will be updated from the pending transactions.
         """
-
         log(f"[*] Persisting chain {chain.name} to the database")
         collection = self.__db_client.get_collection(chain.name)
 
@@ -111,12 +114,23 @@ class BlockchainDBInterface:
 
         log(f"[+] Persisted chain {chain.name}")
 
-    def restore_chain(self, chain: Blockchain) -> bool:
-        """_summary_
+
+    def restore_chain(self, chain_name: str) -> Blockchain | None:
+        """Restore a chain from the database using the name of the chain
+
         Args:
-            chain (Blockchain): Chain that should be restored from the database. Chains that
+            chain_name (str): Chain that should be restored from the database. Chains that
             do not exist will throw an error
         Returns:
             bool: True if chain is successfully restored, false otherwise
         """
-        
+        collection = self.__db.get_collection(name=chain_name)
+        log(collection)
+        if collection is None:
+            log(f"[-] No collection found for chain f{chain_name}")
+            return collection
+
+        result = collection.find_one(filter={'chain_name': chain_name})
+        log(result)
+
+        return None

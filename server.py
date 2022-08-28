@@ -26,6 +26,7 @@ app = FastAPI(
 )
 app_start_time = time.time()
 
+
 def pull_chain(chain_name: str) -> Blockchain | None:
     """Retrieve a chain from storage. Checks if the chain exists in the cache, then attempts
     to retreive the chain from the database. Returns the found chain, or None
@@ -38,14 +39,18 @@ def pull_chain(chain_name: str) -> Blockchain | None:
     """
     #   Check if the chain exists in the cache
     for chain in cache:
-        if chain["chain_name"] == chain_name:
+        if chain[chain_name] == chain_name:
             log("[+] Restored chain from the cache", "d")
             return chain["chain_obj"]
-        
+
     #   TODO Check if the chain can be restored from storage
+    retreived_chain = None
+    if db_interface.restore_chain(chain_name):
+        return retreived_chain
+
     #   TODO Cache the chain if it is restored from storage
-    
-    #   If the chain cannot be 
+
+    #   If the chain cannot be retrieved from the cache return None
     return None
 
 
@@ -71,7 +76,6 @@ def cache_chain(chain: Blockchain) -> bool:
         for chain_name, chain_obj in cache:
             if chain_obj.modified_date < oldest[1] or oldest[1] == None:
                 oldest = (chain_name, chain_obj.modified_time)
-
 
     else:
         cache[chain.name] = chain
@@ -168,7 +172,9 @@ async def health() -> JSONResponse:
 @app.get("/v1/chain/", status_code=200, tags=["Chain Methods"])
 async def get_chain(
     chain_name: str = Query(
-        default="null", title="Chain Name", alias="chain_name", example="zchain"
+        title="Chain Name",
+        alias="chain_name",
+        example="zchain"
     )
 ) -> JSONResponse:
     """Retrieve a chain. First check if the chain exists in the cache. If it does not, then
@@ -180,7 +186,6 @@ async def get_chain(
     Returns:
         JSONResponse: JSON representation of the chain
     """
-    # TODO Validate query params
     # TODO Retrieve chain from cache / database
     # TODO Add chain to cache if necessary
 
