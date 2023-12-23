@@ -17,7 +17,7 @@ from src.blockchain import Blockchain
 
 log = Logger("api")
 cache = dict()  # [Chain name, Chain obj.]
-db_interface = BlockchainDBInterface()
+db_interface = BlockchainDBInterface(host="0.0.0.0", port=27017)
 
 app = FastAPI(
     title="Blockchain Demo",
